@@ -1,0 +1,1548 @@
+<!doctype html><html lang="my"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>တိုးပွားကြီး ပန်သစ္စာ — အော်ဒါ၊ အရောင်းနှင့် စာရင်းစီမံခန့်ခွဲမှု</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f3f6fa;margin:0;color:#17212b}header{background:#1f4e78;color:#fff;padding:16px;text-align:center}nav{display:flex;gap:5px;overflow:auto;background:#fff;padding:8px;position:sticky;top:0}button{background:#1f4e78;color:#fff;border:0;border-radius:7px;padding:10px;margin:3px}main{max-width:1200px;margin:auto;padding:12px}.box{background:#fff;border-radius:10px;padding:14px;margin:10px 0;box-shadow:0 2px 8px #0001}.hidden{display:none}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.metric{font-size:22px;font-weight:bold}input,select{width:100%;box-sizing:border-box;padding:9px;margin:4px 0 9px;border:1px solid #ccd4dc;border-radius:6px}.nav-category{width:auto;min-width:180px;margin:0;background:#1f4e78;color:#fff;border:0;font-weight:bold;cursor:pointer}table{width:100%;border-collapse:collapse}th,td{padding:7px;border-bottom:1px solid #ddd;text-align:left}th{background:#d9eaf7}.danger{background:#b42318}.success{background:#18794e}.scroll{overflow:auto}
+
+@media print{body>*:not(#printArea){display:none!important}#printArea{display:block!important}}
+#printArea{display:none}
+@media print{ @page{size:58mm auto;margin:2mm} .voucher-print{width:54mm;font-family:Arial,sans-serif;font-size:11px;color:#000}.voucher-print h2{font-size:16px;text-align:center;margin:0 0 5px}.voucher-print .line{border-top:1px dashed #000;margin:5px 0}.voucher-print table{width:100%;font-size:10px}.voucher-print td,.voucher-print th{padding:2px;border:0}.voucher-print .right{text-align:right}.voucher-print .center{text-align:center}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>#liveMap{height:480px;border-radius:10px;z-index:1}.live-status{padding:8px;border-radius:7px;background:#f3f6fa;margin:5px 0}.online{color:#18794e;font-weight:bold}.offline{color:#b42318;font-weight:bold}.tracking{color:#1f4e78;font-weight:bold}.vehicle-card{border:1px solid #ddd;border-radius:8px;padding:9px;margin:6px 0;background:#fff;cursor:pointer}.vehicle-card:hover{background:#f3f7fb}.map-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:10px}@media(max-width:800px){.map-grid{grid-template-columns:1fr}#liveMap{height:380px}}
+.san-badge{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;box-sizing:border-box;border:3px solid currentColor;padding:0;font-weight:900;font-size:28px;line-height:1;border-radius:12px;vertical-align:middle;} .voucher-print .san-badge{width:34px;height:34px;border-width:2px;font-size:21px;border-radius:8px;vertical-align:middle;}
+</style><style id='cloud-owner-status'>.cloud-owner-status{margin:8px 0;padding:9px 12px;border-radius:9px;border:1px solid #d9dee7;background:#f7f9fc;font-size:13px}</style>
+<script id="shared-firebase-rtdb-config">
+window.SHARED_FIREBASE_DATABASE_URL = "https://toe-pwar-gyi-business-app-default-rtdb.asia-southeast1.firebasedatabase.app";
+</script>
+
+<script id="secure-rtdb-role-config">
+window.TPG_FIREBASE = {
+  databaseURL: "https://toe-pwar-gyi-business-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+  dataRoot: "appData",
+  rolesRoot: "users",
+  staffAccessRoot: "staffAccess",
+  orderStatusRoot: "orderDeliveryStatus",
+  driverNotificationsRoot: "driverOrderNotifications",
+  vehicleLocationsRoot: "vehicleLocations"
+};
+</script>
+
+
+<script id="secure-rtdb-auth-helper">
+(function(){
+  window.tpgFirebaseAuth = {
+    auth: null,
+    user: null,
+    ready: false,
+    async init(){
+      try{
+        if(!window.firebase) return false;
+        if(!this.auth){
+          const app = firebaseApp || (window.firebase.apps && window.firebase.apps.length ? window.firebase.app() : null);
+          if(!app) return false;
+          this.auth = window.firebase.auth(app);
+          this.auth.onAuthStateChanged(u => {
+            this.user = u || null;
+            this.ready = !!u;
+            try{ if(u){ initFirestore(); setTimeout(()=>syncBusinessDataToFirestore(true),500); } }catch(e){}
+            window.dispatchEvent(new CustomEvent('tpg-firebase-auth-changed',{detail:{user:u||null}}));
+          });
+        }
+        return true;
+      }catch(e){ console.warn('Firebase Auth init:', e); return false; }
+    },
+    async login(email,password){
+      await this.init();
+      return this.auth.signInWithEmailAndPassword(email,password);
+    },
+    async logout(){
+      if(this.auth) return this.auth.signOut();
+    }
+  };
+})();
+</script>
+
+</head>
+<body>
+<header style="line-height:1.45">
+  <h2 style="margin:0 0 5px">အစဥ်ကောင်းသည်ထက်ကောင်းအောင်ဆောင်ရွက်နေမည့်</h2>
+  <div style="font-size:15px;font-weight:bold">စေတနာ ဦးစိုးမောင် မိသားစု</div>
+  <div style="font-size:20px;font-weight:bold;margin-top:5px"><span class="san-badge">စံ</span> တိုးပွားကြီး (ပန်သစ္စာ)</div>
+  <div style="font-size:14px;margin-top:5px">ဝါး၊ ဓနိ၊ ထရံ၊ အုတ်၊ သဲ၊ ကျောက်၊ ဘိလပ်မြေ အိမ်ဆောက်ပစ္စည်းအရောင်းဆိုင်</div>
+  <div style="font-size:13px">အမှတ်(၁၂၃၉)၊ တိုးချဲ့(၂)လမ်း၊ ၂-မြောက်ရပ်ကွက်၊ သာကေတ၊ ရန်ကုန်မြို့</div>
+  <div style="font-size:13px;margin-top:3px">09 421022335, 09 421022334, 01 9551049</div>
+</header>
+
+<nav>
+  <button class="easy-nav" data-section="dash" onclick="show('dash')">ပင်မစာမျက်နှာ</button>
+  <button class="easy-nav" data-section="order" onclick="show('order')">🛒 အော်ဒါအသစ်</button>
+  <button class="easy-nav" data-section="orders" onclick="show('orders')">📋 အော်ဒါစာရင်း</button>
+  <button class="easy-nav" data-section="customer" onclick="show('customer')">👥 ဝယ်သူများ</button>
+  <button class="easy-nav" data-section="product" onclick="show('product')">📦 ကုန်ပစ္စည်း</button>
+  <button class="easy-nav" data-section="sale" onclick="show('sale')">💰 ရောင်းစာရင်း</button>
+  <button class="easy-nav" data-section="car" onclick="show('car')">🚗 ကားစာရင်း</button>
+  <button class="easy-nav" data-section="liveMapSection" onclick="show('liveMapSection')">🗺️ ကားများ တိုက်ရိုက်မြေပုံ</button>
+  <button class="easy-nav" data-section="reports" onclick="show('reports')">📊 အစီရင်ခံစာ</button>
+  <button class="easy-nav" data-section="backup" onclick="show('backup')">အရန်သိမ်းဆည်းမှု</button>
+  <button class="easy-nav" data-section="staff" onclick="show('staff')">👥 ဝန်ထမ်းစီမံခန့်ခွဲမှု</button>
+    <option value="sale">💰 ရောင်းစာရင်း</option>
+    <option value="car">🚗 ကားစာရင်း</option>
+    <option value="reports">📊 အစီရင်ခံစာ</option>
+    <option value="backup">💾 အရန်သိမ်းဆည်းမှု</option>
+  </select>
+</nav>
+<div id="easyModeBar" class="easy-mode-bar" style="display:none">
+  <span id="easyModeUser">👤 ဝန်ထမ်း</span>
+  <span class="easy-mode-help">💡 လွယ်ကူအသုံးပြုမှု — အဓိကလုပ်ဆောင်ချက်များကိုသာ ပြထားပါသည်။</span>
+  <button class="smallbtn" type="button" onclick="show('dash')">🏠 ပင်မ</button>
+  <button class="smallbtn danger" type="button" onclick="logoutStaff()">ထွက်မည်</button>
+</div>
+
+<div id="loginGate" style="position:fixed;inset:0;background:#f3f6faeF;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px">
+  <div class="box" style="width:min(420px,100%);text-align:center"><h2>🔐 ဝန်ထမ်းဝင်ရောက်ရန်</h2><p>Toe Pwar Gyi ဆိုင်စာရင်းစနစ်</p><input id="loginPin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN နံပါတ်" onkeydown="if(event.key==='Enter')loginStaff()"><button class="success" style="width:100%" onclick="loginStaff()">ဝင်ရောက်မည်</button><div style="border-top:1px solid #ddd;margin:12px 0;padding-top:10px;text-align:left"><b>☁️ Firebase Cloud ချိတ်ရန်</b><small style="display:block;color:#667;margin:4px 0 7px">Firebase Authentication ထဲရှိ Email / Password ကိုထည့်ပါ။</small><input id="cloudEmail" type="email" placeholder="Firebase Email"><input id="cloudPassword" type="password" placeholder="Firebase Password" onkeydown="if(event.key==='Enter')cloudLogin()"><button type="button" style="width:100%" onclick="cloudLogin()">☁️ Cloud Login / Sync</button><div id="cloudLoginMsg" style="font-size:12px;margin-top:5px"></div></div><p id="loginMsg" class="dangerText"></p></div>
+</div>
+
+<main>
+<datalist id="customerNameList"></datalist>
+<section id="dash">
+  <div class="box driver-home-hide staff-simple-hide" style="background:#fff8e1;border:1px solid #f0d36a"><h3>💰 ဝယ်သူများထံမှ ရရန်ရှိငွေ</h3><div id="dReceivable" style="font-size:24px;font-weight:bold;color:#b42318">0 Ks</div><small>အော်ဒါ/အရောင်းတွင် ပေးပြီးငွေ နှုတ်ပြီး၊ အကြွေးပေးချေမှုများလည်း ထည့်တွက်ထားသည်။</small></div>
+  <div class="grid">
+    <div class="box">ယနေ့ အော်ဒါ<div id="dOrders" class="metric">0</div></div>
+    <div class="box">ဆိုင်းငံ့ / ပြင်ဆင်နေသည်<div id="dPending" class="metric">0</div></div>
+    <div class="box">လမ်းတွင်<div id="dTransit" class="metric">0</div></div>
+    <div class="box">အချိန်ကျော်<div id="dအချိန်ကျော်" class="metric dangerText">0</div></div>
+    <div class="box">Delivered<div id="dDelivered" class="metric">0</div></div>
+    <div class="box driver-home-hide">ယနေ့ရောင်းရငွေ<div id="salesT" class="metric">0</div></div>
+    <div class="box driver-home-hide">ဝယ်သူရရန်ရှိ<div id="recvT" class="metric">0</div></div>
+    <div class="box staff-home-hide" data-admin-manager-home>ကား အသားတင်အမြတ်<div id="carT" class="metric">0</div></div>
+  </div>
+  <div id="easyQuickActions" class="box easy-quick-actions">
+    <h3>⭐ အလွယ်တကူ လုပ်ဆောင်ရန်</h3>
+    <div class="quick-grid">
+      <button class="quick-btn" onclick="show('order')">🛒<span>အော်ဒါအသစ်</span></button>
+      <button class="quick-btn" onclick="show('orders')">📋<span>အော်ဒါစာရင်း</span></button>
+      <button class="quick-btn" onclick="show('sale')">💰<span>ရောင်းစာရင်း</span></button>
+      <button class="quick-btn" onclick="show('customer')">👥<span>ဝယ်သူ / အကြွေး</span></button>
+    </div>
+  </div>
+  <div class="box">
+    <h3>📋 နောက်ဆုံး အော်ဒါစာရင်း</h3>
+    <div class="scroll"><table><thead><tr><th>အော်ဒါအမှတ်</th><th>ဝယ်သူ</th><th>ပို့သည့်ကား</th><th>ပစ္စည်း</th><th>ရက်စွဲ</th><th>အခြေအနေ</th></tr></thead>
+    <tbody id="urgentOrders"></tbody></table></div>
+  </div>
+  <div class="box">
+    <h3>📦 ပစ္စည်းလက်ကျန်</h3>
+    <div class="scroll"><table><thead><tr><th>အမှတ်</th><th>ပစ္စည်းအမည်</th><th>အမျိုးအစား</th><th class="admin-buy-only">ဝယ်ဈေး</th><th>ရောင်းဈေး</th><th>လက်ကျန်</th></tr></thead>
+    <tbody id="stock"></tbody></table></div>
+  </div>
+</section>
+
+<section id="order" class="hidden">
+  <div class="box">
+    <h3>🛒 အော်ဒါအသစ် လက်ခံရန်</h3>
+    <div class="grid">
+      <div><label>အော်ဒါအမှတ်</label><input id="oid" readonly></div>
+      <div><label>ဘောက်ချာအမှတ်</label><input id="ovoucher" placeholder="Voucher နံပါတ်"></div>
+      <div><label>အော်ဒါရက်စွဲ</label><input id="odate" type="date"></div>
+      <div><label>ဝယ်သူအမည်</label><input id="obuyer" list="customerNameList" placeholder="ဝယ်သူအမည်" oninput="updateOrderCustomerBalance()">
+        <div id="orderCustomerBalance" style="margin-top:6px;padding:8px 10px;border-radius:8px;background:#f5f7fa;font-weight:bold;color:#333">ယခင်ရရန်ရှိငွေ: 0 Ks</div></div>
+      <div><label>ဖုန်းနံပါတ်</label><input id="ophone" placeholder="09xxxxxxxxx"></div>
+      <div><label>မျှော်မှန်းပို့ဆောင်ရက်</label><input id="expected" type="date"></div>
+    </div>
+    <label>လိပ်စာ</label><input id="oaddress" placeholder="ပို့ရမည့်လိပ်စာ">
+    <div class="box"><h4>📦 အော်ဒါပစ္စည်းစာရင်း — အကန့်အသတ်မရှိ</h4>
+      <div class="scroll"><table><thead><tr><th>#</th><th>ပစ္စည်း</th><th>အရေအတွက်</th><th>အရွယ်အစား / အရောင်</th><th>တစ်ယူနစ်ဈေး</th><th>လျှော့ဈေး</th><th>စုစုပေါင်း</th><th>ဖယ်ရန်</th></tr></thead><tbody id="orderItems"></tbody></table></div>
+      <button onclick="addOrderItem()">+ ပစ္စည်းထည့်ရန်</button>
+      <div class="grid"><div><label>ကားခ</label><input id="odeliveryFee" type="number" value="0" oninput="updateOrderTotal()"></div><div><label>လုပ်သားခ</label><input id="olaborFee" type="number" value="0" oninput="updateOrderTotal()"></div></div><div style="text-align:right;font-size:20px;font-weight:bold">Order Total: <span id="orderGrandTotal">0</span> Ks</div>
+      <div class="grid"><div><label>ငွေပေးချေမှု</label><select id="opay"><option value="cash">ငွေပေးပြီး / ငွေသား</option><option value="credit">ပစ္စည်းရောက်မှပေး / ရရန်ရှိ</option><option value="partial">တစ်စိတ်တစ်ပိုင်းပေးချေ</option></select></div><div><label>ပေးချေပြီး</label><input id="opaid" type="number" value="0" oninput="updateOrderTotal()"></div><div><label>ရရန်ရှိ</label><input id="obalance" type="number" value="0" readonly></div></div>
+    </div>
+    <div class="grid">
+      <div><label>ပို့သည့်ကား</label><select id="odeliveryCar"></select></div>
+      <div><label>ပို့ဆောင်ရေး</label><input id="ocourier" placeholder="Delivery company"></div>
+      <div><label>ခြေရာခံအမှတ်</label><input id="otracking" placeholder="Tracking number"></div>
+    </div>
+    <label>မှတ်ချက်</label><input id="onote" placeholder="အထူးညွှန်ကြားချက်">
+    <button onclick="addOrder()">အော်ဒါသိမ်းမည်</button>
+    <button onclick="clearOrder()">ရှင်းလင်းမည်</button>
+  </div>
+</section>
+
+<section id="orders" class="hidden">
+  <div class="box" style="background:#eef8ff;border:1px solid #9ec5e5">
+    <h3>📡 အော်ဒါပို့ဆောင်မှု အသိပေးချက်</h3>
+    <div id="orderSyncStatus" class="live-status">🔴 အွန်လိုင်း Sync မချိတ်ရသေးပါ</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="smallbtn" onclick="enableDeliveryNotifications()">🔔 အသိပေးချက် ဖွင့်မည်</button>
+      <span id="deliveryNotifyStatus" style="font-size:13px;color:#555">Browser Notification မဖွင့်ရသေးပါ</span>
+    </div>
+    <div id="deliveryNotifyBox" style="display:none;margin-top:10px;padding:10px;border-radius:8px;background:#e8f7ee;border:1px solid #9ad3ae"></div>
+    <p style="margin:5px 0;font-size:13px">ကား/ပို့သူက <b>✅ ပစ္စည်းပို့ပြီး</b> ကိုနှိပ်လိုက်ပါက ဆိုင်ဘက် Order စာရင်းတွင် အခြေအနေကို အလိုအလျောက် ပြောင်းပေးပါမည်။</p>
+    <div class="grid">
+      <div><label>Firebase Realtime Database URL</label><input id="orderSyncUrl" placeholder="https://toe-pwar-gyi-business-app-default-rtdb.asia-southeast1.firebasedatabase.app"></div>
+      <div style="display:flex;align-items:end"><button class="success" onclick="connectOrderSync()">📡 Sync ချိတ်မည်</button></div>
+    </div>
+    <small>ဖုန်း ၂ လုံးစလုံးတွင် တူညီသော Firebase Realtime Database URL ကို တစ်ကြိမ်စီ ချိတ်ပါ။</small><p style="font-size:12px;color:#666;margin:6px 0">Driver Notification အတွက် Admin မှ Driver Account ကို သက်ဆိုင်ရာကားနှင့် ချိတ်ပေးထားရပါမည်။</p>
+  </div>
+
+  <div class="box">
+    <h3>📋 အော်ဒါခြေရာခံစာရင်း</h3>
+    <input id="orderSearch" placeholder="အော်ဒါအမှတ် / ဝယ်သူ / ဖုန်း / ခြေရာခံအမှတ် ရှာရန်" oninput="renderOrders()">
+    <div id="orderCustomerGrandTotal" style="margin:10px 0;padding:12px;border:1px solid #d9dee7;border-radius:10px;background:#f7f9fc;font-weight:600;line-height:1.8">Customer အမည်ရိုက်ပါက ရရန်ရှိငွေ Grand Total ကို ဒီနေရာမှာ ပြပါမယ်။</div>
+    <select id="statusFilter" onchange="renderOrders()">
+      <option value="">အခြေအနေအားလုံး</option><option>အသစ်</option><option>အတည်ပြုပြီး</option><option>ပြင်ဆင်နေသည်</option>
+      <option>ထုပ်ပိုးပြီး</option><option>ပို့ဆောင်ပြီး</option><option>လမ်းတွင်</option><option>ပို့ဆောင်ရန်ထွက်ခွာပြီး</option>
+      <option>ပို့ဆောင်ပြီးစီး</option><option>ဆိုင်းငံ့ထား</option><option>ပို့ဆောင်မအောင်မြင်</option><option>ပြန်အပ်ပြီး</option><option>ပယ်ဖျက်ပြီး</option>
+    </select>
+    <div class="scroll"><table><thead><tr>
+      <th>အော်ဒါအမှတ်</th><th>ရက်စွဲ</th><th>ဝယ်သူ</th><th>လိပ်စာ</th><th>ပို့သည့်ကား</th><th>ပစ္စည်း</th><th>အရေအတွက်</th><th>စုစုပေါင်း</th>
+      <th>ပေးချေပြီး</th><th>ရရန်ရှိ</th><th>မျှော်မှန်းရက်</th><th>ပို့ဆောင်ရေး / ခြေရာခံ</th><th>မှတ်ချက်</th><th>အခြေအနေ</th><th>လုပ်ဆောင်ချက်</th>
+    </tr></thead><tbody id="ordersBody"></tbody></table></div>
+  </div>
+</section>
+
+<section id="customer" class="hidden">
+  <div class="box">
+    <h3>🔍 ဝယ်သူရှာဖွေခြင်း / အော်ဒါမှတ်တမ်း</h3>
+    <input id="customerSearch" placeholder="ဝယ်သူအမည် / ဖုန်းနံပါတ် ရိုက်ပါ..." oninput="renderCustomers()">
+    <div class="box" style="margin-top:12px;background:#f7fbff"><h4>💵 အကြွေးပေးချေမှု မှတ်တမ်းတင်ရန်</h4>
+      <div class="grid"><div><label>ဝယ်သူအမည်</label><input id="creditCustomerName" list="customerNameList" placeholder="ဝယ်သူအမည်"></div><div><label>ပေးချေသည့်ရက်</label><input id="creditPaymentDate" type="date"></div><div><label>ပေးချေငွေ</label><input id="creditPaymentAmount" type="number" min="0" placeholder="ပေးချေငွေ"></div><div><label>မှတ်ချက်</label><input id="creditPaymentNote" placeholder="ဥပမာ - အကြွေးရှင်း၊ တစ်စိတ်တစ်ပိုင်းပေး"></div></div>
+      <button onclick="addCustomerPayment()">💾 အကြွေးပေးချေမှု သိမ်းမည်</button>
+    </div>
+    <div id="customerResults"></div>
+  </div>
+</section>
+
+<section id="product" class="hidden">
+  <div class="box">
+    <h3>ကုန်ပစ္စည်းထည့်ရန် <span id="buyPriceStatus" style="font-size:12px;font-weight:normal;color:#18794e">(Admin အတွက် ဝယ်ဈေးပြထားသည်)</span></h3>
+    <input id="pid" placeholder="ပစ္စည်းအမှတ်"><input id="pname" list="productNameList" placeholder="ပစ္စည်းအမည် (ရွေးရန်/ရိုက်ထည့်ရန်)"><datalist id="productNameList"></datalist>
+    <select id="ptype"><option value="">ပစ္စည်းအမျိုးအစား ရွေးပါ</option><option>အစားအသောက်</option><option>အဝတ်အစား</option><option>အိမ်သုံးပစ္စည်း</option><option>အီလက်ထရောနစ်</option><option>အလှကုန်</option><option>ဆောက်လုပ်ရေးပစ္စည်း</option><option>ဘိလပ်မြေ</option><option>အုတ်/သဲ/ကျောက်</option><option>ဝါး/မျော</option><option>အုန်းဆံကြိုး</option><option>အထပ်သား</option><option>အိမ်ဆောက်သံ</option><option>ရုံးသုံးပစ္စည်း</option><option>အခြား</option></select>
+    <span id="buyAdminOnly" class="admin-buy-only" style="display:none"><label style="display:block;font-weight:bold">ဝယ်ဈေး (Admin သာမြင်ရမည်)</label><input id="buy" type="number" placeholder="ဝယ်ဈေး"></span><input id="sell" type="number" placeholder="ရောင်းဈေး">
+    <input id="open" type="number" placeholder="အစလက်ကျန်">
+    <button onclick="addProduct()">သိမ်းမည်</button>
+  </div>
+  <div class="box">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));align-items:end">
+      <div><label>🔎 ပစ္စည်းအမည် စစ်ထုတ်ရန်</label><input id="productNameFilter" placeholder="ပစ္စည်းအမည် ရှာရန်" oninput="filterProductTable()"></div>
+      <div><label>🔎 အမျိုးအစား စစ်ထုတ်ရန်</label><select id="productTypeFilter" onchange="filterProductTable()"><option value="">အမျိုးအစားအားလုံး</option></select></div>
+    </div>
+    <div class="scroll"><table><thead><tr><th>အမှတ်</th><th>ပစ္စည်းအမည်</th><th>အမျိုးအစား</th><th class="admin-buy-only">ဝယ်ဈေး</th><th>ရောင်းဈေး</th><th>အစလက်ကျန်</th><th>လုပ်ဆောင်ချက်</th></tr></thead>
+  <tbody id="products"></tbody></table></div>
+</section>
+
+<section id="sale" class="hidden"><div class="box"><h3>နေ့စဉ် ကုန်ပစ္စည်းရောင်းစာရင်း — အကန့်အသတ်မရှိ</h3><div class="grid"><div><label>ဘောက်ချာအမှတ်</label><input id="svoucher" placeholder="Voucher နံပါတ်"></div><div><label>ရက်စွဲ</label><input id="sdate" type="date"></div><div><label>ဝယ်သူ</label><input id="buyer" list="customerNameList" placeholder="ဝယ်သူနာမည်"></div><div><label>ပို့သည့်ကား</label><select id="sdeliveryCar"><option value="">ကားရွေးပါ</option></select></div><div><label>သွားခဲ့သည့်နေရာ</label><input id="saddress" placeholder="ပို့ဆောင်သည့်နေရာ / Location"></div><div><label>မှတ်ချက်</label><input id="snote" placeholder="မှတ်ချက်"></div><div><label>ငွေပေးချေမှု</label><select id="pay"><option value="cash">ချက်ချင်းပေးချေ</option><option value="credit">ရရန်ရှိ</option><option value="payment">အကြွေးပေးချေ</option></select></div></div><div class="box"><h4>📦 ပစ္စည်းစာရင်း</h4><div class="scroll"><table><thead><tr><th>#</th><th>ပစ္စည်း</th><th>အရေအတွက်</th><th>ရောင်းဈေး</th><th>စုစုပေါင်း</th><th>ဖယ်ရန်</th></tr></thead><tbody id="saleItems"></tbody></table></div><button onclick="addSaleItem()">+ ပစ္စည်းထည့်ရန်</button><div class="grid"><div><label>ကားခ</label><input id="sdeliveryFee" type="number" value="0" oninput="updateSaleTotal()"></div><div><label>လုပ်သားခ</label><input id="slaborFee" type="number" value="0" oninput="updateSaleTotal()"></div></div><div style="text-align:right;font-size:20px;font-weight:bold">စုစုပေါင်း: <span id="saleGrandTotal">0</span> Ks</div><div class="grid"><div><label>ပေးချေငွေ</label><input id="paid" type="number" value="0" oninput="updateSaleTotal()"></div><div><label>ရရန်ရှိ</label><input id="saleBalance" type="number" value="0" readonly></div></div><button onclick="addSale()">ရောင်းစာရင်းသိမ်းမည်</button><button onclick="clearSaleForm()">ရှင်းလင်းမည်</button></div></div><div class="box"><table><thead><tr><th>ရက်စွဲ</th><th>ဝယ်သူ</th><th>ပစ္စည်းများ</th><th>အရေအတွက်</th><th>ပို့သည့်ကား</th><th>ရောင်းရငွေ</th><th>ပေးချေ</th><th>ရရန်ရှိ</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody id="sales"></tbody></table></div></section>
+
+<section id="car" class="hidden"><div class="box"><h3>🚗 ကားနေ့စဉ်စာရင်း</h3><div class="grid"><div><label>ရက်စွဲ</label><input id="cdate" type="date"></div><div><label>ကား</label><select id="cid"></select></div><div><label>ငွေရ</label><input id="cin" type="number" placeholder="ငွေရ"></div><div><label>ငွေထွက်</label><input id="cex" type="number" placeholder="ငွေထွက်"></div><div><label>ယာဉ်မောင်းလစာ</label><input id="csal" type="number" placeholder="ယာဉ်မောင်းလစာ"></div></div><button onclick="addCar()">သိမ်းမည်</button></div><div class="box"><h4>➕ ကားအသစ်ထည့်ရန် / ကားအမည်ပြင်ရန်</h4><div class="grid"><div><label>ကားအမည်</label><input id="newCarName" placeholder="ဥပမာ CAR-06 / Delivery Van"></div></div><button onclick="addNewCar()">ကားအသစ်ထည့်မည်</button><div class="grid" id="carNameEditor"></div><button onclick="saveCarNames()">ကားအမည်များ သိမ်းမည်</button></div><div class="box"><h4>📍 ကားတစ်စီးချင်း အော်ဒါသွားခဲ့သည့် မှတ်တမ်း</h4><div class="scroll"><table><thead><tr><th>ကား</th><th>အော်ဒါ + ရောင်းခေါက်ရေ</th><th>ငွေရ</th><th>ငွေထွက်</th><th>လစာ</th><th>အသားတင်</th><th>အော်ဒါသွားခဲ့သည့် နေရာ / ဝယ်သူ / မှတ်ချက်</th></tr></thead><tbody id="cars"></tbody></table></div></div></section>
+
+<section id="liveMapSection" class="hidden">
+<div class="box">
+  <h3>🗺️ 🚗 ကားများ တိုက်ရိုက်မြေပုံ</h3>
+  <div class="live-status" id="firebaseStatus">Firebase: မချိတ်ဆက်ရသေးပါ</div>
+  <p style="margin:6px 0">ကားများ၏ GPS Location ကို Firebase Realtime Database မှ real-time ကြည့်ရှုနိုင်ပါသည်။</p>
+  <div class="grid">
+    <div><label>Firebase တိုက်ရိုက်ဒေတာဘေ့စ် လိပ်စာ</label><input id="rtdbUrl" placeholder="https://toe-pwar-gyi-business-app-default-rtdb.asia-southeast1.firebasedatabase.app"><small>Firebase Console → Realtime Database → Data မှ URL ကို copy ထည့်ပါ။</small></div>
+    <div style="display:flex;align-items:end"><button class="success" onclick="connectLiveFirebase()">☁️ Firebase ချိတ်ဆက်မည်</button></div>
+  </div>
+</div>
+<div class="box">
+  <h4>☁️ Firebase GPS ဒေတာဖွဲ့စည်းပုံ</h4>
+  <p>Real-time GPS data ကို Firebase Realtime Database ရဲ့ <b>vehicleLocations</b> node အောက်မှာ သိမ်းပါမယ်။</p>
+  <pre style="background:#f3f6fa;padding:10px;border-radius:8px;overflow:auto;font-size:12px">vehicleLocations
+ ├── CAR-01
+ │   ├── lat
+ │   ├── lng
+ │   ├── speed
+ │   ├── heading
+ │   ├── driver
+ │   ├── orderId
+ │   ├── destination
+ │   ├── online
+ │   └── updatedAt
+ ├── CAR-02
+ ├── CAR-03
+ ├── CAR-04
+ └── CAR-05</pre>
+  <small>ကားအရေအတွက်ကို App ထဲက 🚗 ကားစာရင်းမှ ထပ်တိုးနိုင်ပြီး GPS node ကို အလိုအလျောက်အသုံးပြုနိုင်ပါတယ်။</small>
+</div>
+<div class="box">
+  <h4>📱 ယာဉ်မောင်း GPS ခြေရာခံခြင်း</h4>
+  <div class="grid">
+    <div><label>ကား</label><select id="liveVehicleSelect"></select></div>
+    <div><label>ယာဉ်မောင်းအမည်</label><input id="liveDriverName" placeholder="Driver အမည်"></div>
+    <div><label>အော်ဒါအမှတ်</label><input id="liveOrderId" placeholder="ORD-..."></div>
+    <div><label>သွားမည့်နေရာ</label><input id="liveDestination" placeholder="ပို့ရမည့်နေရာ"></div>
+  </div>
+  <button class="success" onclick="startVehicleTracking()">📍 GPS ခြေရာခံစမည်</button>
+  <button class="danger" onclick="stopVehicleTracking()">⏹️ ခြေရာခံခြင်းရပ်မည်</button>
+  <div id="trackingStatus" class="live-status">Tracking: OFF</div>
+  <small>မှတ်ချက် — ဒီ HTML version သည် ဖုန်း browser ကို ဖွင့်ထားချိန် GPS ကို Firebase သို့ ပို့ပေးနိုင်ပါသည်။ Screen ပိတ်ထားချိန်/background tracking အတွက် Android app + foreground location service လိုအပ်ပါမည်။</small>
+</div>
+<div class="box">
+  <div class="map-grid">
+    <div><div id="liveMap"></div></div>
+    <div><h4>🚗 လက်ရှိကားများ</h4><div id="liveVehicleList">Firebase ချိတ်ပြီးနောက် ကားများပြပါမည်။</div></div>
+  </div>
+</div>
+</section>
+<section id="reports" class="hidden">
+  <div class="box"><h3>နေ့/လ/နှစ်ချုပ် အစီရင်ခံစာ</h3>
+    <select id="period" onchange="report()"><option value="day">နေ့ချုပ်</option><option value="month">လချုပ်</option><option value="year">နှစ်ချုပ်</option></select>
+    <input id="rdate" type="date" onchange="report()"><input id="ryear" type="number" value="2026" onchange="report()">
+    <div id="reportout"></div>
+  </div>
+</section>
+
+<section id="backup" class="hidden">
+  <div class="box"><h3>🛡️ ဒေတာကာကွယ်ခြင်းနှင့် အရန်သိမ်းဆည်းမှု</h3>
+    <p id="dataHealth" style="margin:6px 0;color:#18794e;font-weight:bold">Data စစ်ဆေးနေသည်...</p>
+    <p id="autoBackupStatus" style="margin:6px 0;color:#18794e;font-weight:bold">အလိုအလျောက် Backup စစ်ဆေးနေသည်...</p>
+    <button onclick="backup()">⬇️ ဒေတာအရန်သိမ်းဆည်းရန်</button>
+    <input type="file" accept=".json" onchange="restore(event)">
+    <button onclick="restoreLastGood()">↩️ နောက်ဆုံးအရန်မှ ပြန်ယူရန်</button>
+    <button onclick="repairData()">🔧 ဒေတာစစ်ဆေး / ပြင်ဆင်</button>
+    <button class="danger" onclick="wipe()">စာရင်းအားလုံးဖျက်မည်</button>
+    <p style="font-size:12px;color:#666">သိမ်းတိုင်း နောက်ဆုံး data snapshot ကို browser ထဲမှာထားပြီး နေ့စဉ် Auto Backup ကို 14 ရက်အထိ ထိန်းသိမ်းပေးပါသည်။ အရေးကြီးစာရင်းများအတွက် JSON Backup ကိုလည်း ပုံမှန် Download လုပ်ထားပါ။</p>
+  </div>
+</section>
+
+<section id="staff" class="hidden">
+  <div class="box"><h3>👥 ဝန်ထမ်းနှင့် အသုံးပြုခွင့် စီမံခန့်ခွဲမှု</h3>
+    <p id="currentUserInfo">လက်ရှိဝင်ထားသူ -</p>
+    <div class="grid">
+      <div><label>ဝန်ထမ်းအမည်</label><input id="staffName" placeholder="ဥပမာ - မောင်မောင်"></div>
+      <div><label>PIN နံပါတ်</label><input id="staffPin" type="password" inputmode="numeric" maxlength="8" placeholder="4–8 လုံး"></div>
+      <div><label>အခန်းကဏ္ဍ</label><select id="staffRole"><option value="cashier">အရောင်း / ငွေကိုင်</option><option value="driver">🚚 ပို့ဆောင်သူ / Driver</option><option value="manager">မန်နေဂျာ</option><option value="admin">ပိုင်ရှင် / Admin</option></select></div><div><label>Driver ကား</label><select id="staffDriverCar"><option value="">ကားမရွေးရသေးပါ</option></select></div>
+    </div>
+    <button class="success" onclick="addStaff()">➕ ဝန်ထမ်းထည့်ရန်</button>
+    <div class="scroll"><table><thead><tr><th>အမည်</th><th>အခန်းကဏ္ဍ</th><th>အခြေအနေ</th><th>လုပ်ဆောင်ချက်</th></tr></thead><tbody id="staffList"></tbody></table></div>
+    <p style="font-size:12px;color:#666">အစပိုင်း Admin PIN = <b>1234</b> ဖြစ်ပါသည်။ ပထမဆုံးဝင်ပြီး PIN ကို ပြောင်းပါ။ PIN မေ့ပါက Backup မဖျက်ဘဲ Admin ပြန်သတ်မှတ်ရန် လိုအပ်ပါသည်။</p>
+  </div>
+</section>
+</main>
+<div id="debtEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2147483647;align-items:center;justify-content:center;padding:15px">
+  <div class="box" style="width:min(480px,100%);max-height:90vh;overflow:auto">
+    <h3 id="debtEditTitle">✏️ အကြွေးစာရင်းပြင်ရန်</h3>
+    <input type="hidden" id="debtEditKind"><input type="hidden" id="debtEditId">
+    <div><label>ဝယ်သူအမည်</label><input id="debtEditCustomer" readonly></div>
+    <div><label>စုစုပေါင်းငွေ (Ks)</label><input id="debtEditTotal" type="number" min="0"></div>
+    <div><label>ပေးပြီးငွေ (Ks)</label><input id="debtEditPaid" type="number" min="0"></div>
+    <div><label>ကျန်ငွေ</label><input id="debtEditBalance" type="number" readonly></div>
+    <div><label>မှတ်ချက်</label><input id="debtEditNote"></div>
+    <div style="text-align:right;margin-top:8px"><button type="button" onclick="closeDebtEditor()">မလုပ်တော့ပါ</button><button type="button" class="success" onclick="saveDebtEditor()">💾 သိမ်းမည်</button></div>
+  </div>
+</div>
+<div id="printArea"></div>
+
+<style>
+body{font-family:Arial,sans-serif;background:#f3f6fa;margin:0;color:#17212b}
+header{background:#1f4e78;color:#fff;padding:16px;text-align:center}
+nav{display:flex;gap:5px;overflow:auto;background:#fff;padding:8px;position:sticky;top:0;z-index:10}
+button{background:#1f4e78;color:#fff;border:0;border-radius:7px;padding:10px;margin:3px;cursor:pointer}
+button.danger{background:#b42318}.success{background:#18794e}
+main{max-width:1400px;margin:auto;padding:12px}.box{background:#fff;border-radius:10px;padding:14px;margin:10px 0;box-shadow:0 2px 8px #0001}
+.hidden{display:none}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.metric{font-size:22px;font-weight:bold}.dangerText{color:#b42318}
+input,select{width:100%;box-sizing:border-box;padding:9px;margin:4px 0 9px;border:1px solid #ccd4dc;border-radius:6px}.nav-category{width:auto;min-width:180px;margin:0;background:#1f4e78;color:#fff;border:0;font-weight:bold;cursor:pointer}
+table{width:100%;border-collapse:collapse}th,td{padding:7px;border-bottom:1px solid #ddd;text-align:left;white-space:nowrap}
+th{background:#d9eaf7}.scroll{overflow:auto}.overdue{background:#ffe1e1}.delivered{background:#e5f7eb}.delivered-row{background:#dff5e5 !important}.delivered-row td{background:#dff5e5 !important}.status{font-weight:bold}
+.smallbtn{padding:5px 7px;font-size:12px}.easy-mode-bar{position:sticky;top:0;z-index:11;background:#fff;border-bottom:1px solid #d9e2ec;padding:7px 10px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}.easy-mode-help{font-size:12px;color:#536273;flex:1}.easy-quick-actions{border:1px solid #9ec5e5;background:#f7fbff}.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.quick-btn{min-height:78px;font-size:28px;background:#1f4e78;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;margin:0}.quick-btn span{font-size:14px;font-weight:bold}.easy-nav.easy-hidden{display:none!important}
+    .admin-buy-only{display:none}.staff-home-hide{display:none!important}.admin-home-only{display:none!important}.staff-simple-hide{display:none!important}.driver-home-hide{display:none!important}@media(max-width:700px){.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-btn{min-height:72px}}.debt-edit-btn{background:#1f4e78!important;color:#fff!important;display:inline-block!important;visibility:visible!important;opacity:1!important}.car-name-row{min-width:220px}.car-name-input{cursor:text;pointer-events:auto;background:#fff;color:#17212b}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+// ===== FIREBASE BOOTSTRAP =====
+// Initialize ONE default Firebase app before Auth / Firestore / RTDB are accessed.
+// This prevents "Cannot access firebaseApp before initialization" and
+// "cannot access DEFAULT RTDB URL before initialization" errors.
+const TPG_FIREBASE_CONFIG={apiKey:'AIzaSyC9eejTNPozg5Zb0skbrFyEBpvCVC1R3gI',authDomain:'toe-pwar-gyi-business-app.firebaseapp.com',projectId:'toe-pwar-gyi-business-app',storageBucket:'toe-pwar-gyi-business-app.firebasestorage.app',messagingSenderId:'1057078149836',appId:'1:1057078149836:web:40972f0843cec556803869',measurementId:'G-2DLK4FD7GP'};
+const TPG_DEFAULT_RTDB_URL='https://toe-pwar-gyi-business-app-default-rtdb.asia-southeast1.firebasedatabase.app';
+var firebaseApp=null;
+var liveFirebaseApp=null;
+try{
+  if(window.firebase){
+    // Auth + Firestore use the default app WITHOUT a databaseURL.
+    // RTDB is isolated in a separate named app to prevent RTDB initialization
+    // from interfering with Firebase Authentication requests.
+    firebaseApp = window.firebase.apps && window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(TPG_FIREBASE_CONFIG);
+  }
+}catch(e){ console.error('Firebase Auth/Firestore bootstrap failed:',e); }
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const K='completeApp';
+const DB_VERSION=17;
+const EMPTY_DB={version:DB_VERSION,products:[],sales:[],cars:[],orders:[],payments:[],staff:[{id:'OWNER',name:'ပိုင်ရှင်',role:'admin',pin:'1234'}],audit:[],carNames:{'CAR-01':'CAR-01','CAR-02':'CAR-02','CAR-03':'CAR-03','CAR-04':'CAR-04','CAR-05':'CAR-05'},carList:['CAR-01','CAR-02','CAR-03','CAR-04','CAR-05']};
+function safeNumber(v, fallback=0){const n=Number(v);return Number.isFinite(n)?n:fallback;}
+function cleanText(v){return String(v??'').trim();}
+function currentDate(){return new Date().toISOString().slice(0,10);}
+function makeId(prefix){return prefix+'-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();}
+function normalizeDB(raw){
+  const d=(raw&&typeof raw==='object')?raw:{};
+  d.version=DB_VERSION; d.products=Array.isArray(d.products)?d.products:[]; d.sales=Array.isArray(d.sales)?d.sales:[]; d.orders=Array.isArray(d.orders)?d.orders:[]; d.payments=Array.isArray(d.payments)?d.payments:[]; d.cars=Array.isArray(d.cars)?d.cars:[];
+  d.staff=Array.isArray(d.staff)&&d.staff.length?d.staff:d.staff===[]?[{id:'OWNER',name:'ပိုင်ရှင်',role:'admin',pin:'1234'}]:[{id:'OWNER',name:'ပိုင်ရှင်',role:'admin',pin:'1234'}]; d.staff.forEach(x=>{if(x.role==='driver'&&!('driverCar' in x))x.driverCar='';}); d.audit=Array.isArray(d.audit)?d.audit:[]; d.deletedPayments=Array.isArray(d.deletedPayments)?d.deletedPayments:[]; d.debtEntries=Array.isArray(d.debtEntries)?d.debtEntries:[]; d.deletedDebtEntries=Array.isArray(d.deletedDebtEntries)?d.deletedDebtEntries:[];d.carNames=(d.carNames&&typeof d.carNames==='object')?d.carNames:{}; d.carList=Array.isArray(d.carList)?d.carList:[];
+  ['CAR-01','CAR-02','CAR-03','CAR-04','CAR-05'].forEach(id=>{if(!d.carList.includes(id))d.carList.push(id);if(!d.carNames[id])d.carNames[id]=id;});
+  d.carList=[...new Set(d.carList.map(cleanText).filter(Boolean))]; d.carList.forEach(id=>{d.carNames[id]=cleanText(d.carNames[id])||id;});
+  d.products.forEach((p,i)=>{p.id=cleanText(p.id)||'P-'+String(i+1).padStart(3,'0');p.name=cleanText(p.name);p.type=cleanText(p.type);p.buy=Math.max(0,safeNumber(p.buy));p.sell=Math.max(0,safeNumber(p.sell));p.open=Math.max(0,safeNumber(p.open));});
+  const pids=new Set(d.products.map(p=>p.id));
+  d.orders.forEach((o,i)=>{o.id=cleanText(o.id)||'ORD-'+String(i+1).padStart(4,'0');o.voucherNo=cleanText(o.voucherNo);o.date=cleanText(o.date)||currentDate();o.customer=cleanText(o.customer);o.phone=cleanText(o.phone);o.address=cleanText(o.address);o.note=cleanText(o.note);o.courier=cleanText(o.courier);o.tracking=cleanText(o.tracking);o.deliveryCar=cleanText(o.deliveryCar);o.items=Array.isArray(o.items)?o.items:[];o.items=o.items.filter(x=>x&&pids.has(x.pid)).map(x=>({pid:x.pid,qty:Math.max(0,safeNumber(x.qty)),variant:cleanText(x.variant),price:Math.max(0,safeNumber(x.price)),discount:Math.max(0,safeNumber(x.discount))}));o.deliveryFee=Math.max(0,safeNumber(o.deliveryFee));o.laborFee=Math.max(0,safeNumber(o.laborFee));o.total=Math.max(0,safeNumber(o.total));o.paid=Math.min(o.total,Math.max(0,safeNumber(o.paid)));o.balance=Math.max(0,o.total-o.paid);o.expected=cleanText(o.expected)||o.date;o.status=cleanText(o.status)||'New';});
+  d.sales.forEach((s,i)=>{s.id=cleanText(s.id)||'SAL-'+String(i+1).padStart(5,'0');s.voucherNo=cleanText(s.voucherNo);s.date=cleanText(s.date)||currentDate();s.buyer=cleanText(s.buyer);s.address=cleanText(s.address);s.note=cleanText(s.note);s.deliveryCar=cleanText(s.deliveryCar);s.items=Array.isArray(s.items)?s.items:[];s.items=s.items.filter(x=>x&&pids.has(x.pid)).map(x=>({pid:x.pid,qty:Math.max(0,safeNumber(x.qty)),price:Math.max(0,safeNumber(x.price))}));s.deliveryFee=Math.max(0,safeNumber(s.deliveryFee));s.laborFee=Math.max(0,safeNumber(s.laborFee));s.total=Math.max(0,safeNumber(s.total));s.paid=Math.min(s.total,Math.max(0,safeNumber(s.paid)));s.credit=Math.max(0,s.total-s.paid);});
+  d.payments.forEach((p,i)=>{p.id=cleanText(p.id)||'PAY-'+String(i+1).padStart(5,'0');p.date=cleanText(p.date)||currentDate();p.customer=cleanText(p.customer);p.phone=cleanText(p.phone);p.amount=Math.max(0,safeNumber(p.amount));p.note=cleanText(p.note);p.voucherNo=cleanText(p.voucherNo);});
+  d.cars.forEach(c=>{c.id=cleanText(c.id);c.date=cleanText(c.date)||currentDate();c.inc=Math.max(0,safeNumber(c.inc));c.ex=Math.max(0,safeNumber(c.ex));c.sal=Math.max(0,safeNumber(c.sal));});
+  return d;
+}
+function loadDB(){try{return normalizeDB(JSON.parse(localStorage.getItem(K)||'null'));}catch(e){return normalizeDB(EMPTY_DB);}}
+let db=loadDB();
+const M=x=>safeNumber(x).toLocaleString();
+const today=()=>new Date().toISOString().slice(0,10);
+// ===== FIRESTORE BUSINESS DATA SYNC =====
+// LocalStorage remains the fast/offline source for the UI. Firestore receives a copy
+// of business records so Admin/Staff devices can share the same business data.
+let firestoreDb=null;
+let firestoreReady=false;
+let firestoreSyncTimer=null;
+let firestoreSyncRunning=false;
+let firestoreLastError='';
+
+function initFirestore(){
+  try{
+    if(!window.firebase || !firebase.firestore) return false;
+    if(!firebaseApp){
+      if(!ensureFirebaseConnection(window.SHARED_FIREBASE_DATABASE_URL || '')) return false;
+    }
+    if(!firestoreDb) firestoreDb=firebase.firestore(firebaseApp);
+    firestoreReady=!!firestoreDb;
+    return firestoreReady;
+  }catch(e){
+    firestoreReady=false; firestoreLastError=e.message||String(e);
+    console.warn('Firestore init:',e); return false;
+  }
+}
+function firestoreUser(){
+  try{return (firebaseApp && firebaseApp.auth()) ? firebaseApp.auth().currentUser : null;}catch(e){return null;}
+}
+function setCloudMessage(msg,ok=false){
+  const e=document.getElementById('cloudLoginMsg'); if(e){e.textContent=msg;e.style.color=ok?'#18794e':'#b42318';}
+  const s=document.getElementById('cloudOwnerStatus'); if(s)s.textContent=msg;
+}
+async function cloudLogin(){
+  const email=cleanText(document.getElementById('cloudEmail')?.value);
+  const password=document.getElementById('cloudPassword')?.value||'';
+  if(!email||!password){setCloudMessage('Firebase Email နှင့် Password နှစ်ခုလုံးထည့်ပါ။');return;}
+  try{
+    if(!ensureFirebaseConnection(window.SHARED_FIREBASE_DATABASE_URL || '')){return;}
+    await window.tpgFirebaseAuth.init();
+    await window.tpgFirebaseAuth.login(email,password);
+    initFirestore();
+    setCloudMessage('☁️ Firebase Cloud Login အောင်မြင်ပါသည်။ Data Sync စတင်နေပါသည်။',true);
+    await syncBusinessDataToFirestore(true);
+  }catch(e){setCloudMessage('Cloud Login မအောင်မြင်ပါ — '+(e.message||e.code||e));}
+}
+function firestoreSafe(data){
+  // Firestore accepts normal JSON values; strip undefined/function values recursively.
+  if(data===undefined || typeof data==='function') return null;
+  if(Array.isArray(data)) return data.map(firestoreSafe);
+  if(data && typeof data==='object'){
+    const out={}; Object.keys(data).forEach(k=>{if(data[k]!==undefined && typeof data[k]!=='function')out[k]=firestoreSafe(data[k]);}); return out;
+  }
+  return data;
+}
+async function writeCollection(name, rows, idField='id'){
+  if(!firestoreDb || !Array.isArray(rows)) return 0;
+  let n=0;
+  // Batch writes in groups of 400 to stay below Firestore's 500-operation limit.
+  for(let start=0;start<rows.length;start+=400){
+    const batch=firestoreDb.batch(); const part=rows.slice(start,start+400);
+    part.forEach((row,idx)=>{
+      const rawId=cleanText(row?.[idField]) || `${name}-${start+idx+1}`;
+      const id=rawId.replace(/[^A-Za-z0-9_-]/g,'_').slice(0,150) || `${name}-${start+idx+1}`;
+      batch.set(firestoreDb.collection(name).doc(id),firestoreSafe({...row,_syncedAt:new Date().toISOString()}),{merge:true});
+    });
+    if(part.length){await batch.commit();n+=part.length;}
+  }
+  return n;
+}
+async function syncBusinessDataToFirestore(force=false){
+  if(firestoreSyncRunning) return;
+  const user=firestoreUser();
+  if(!user){
+    if(force) setCloudMessage('Firebase Auth Login မရှိသေးပါ။ အပေါ်မှ Cloud Login လုပ်ပါ။');
+    return;
+  }
+  if(!initFirestore()) return;
+  firestoreSyncRunning=true;
+  try{
+    await writeCollection('products',db.products);
+    await writeCollection('orders',db.orders);
+    await writeCollection('sales',db.sales);
+    await writeCollection('payments',db.payments);
+    await writeCollection('cars',(db.carList||[]).map(id=>({id,name:db.carNames?.[id]||id,active:true})), 'id');
+    await writeCollection('carLedger',db.cars);
+    await writeCollection('staff',db.staff);
+    await writeCollection('debtEntries',db.debtEntries||[]);
+    // Keep a small per-user sync marker; this also makes the cloud connection easy to verify.
+    await firestoreDb.collection('syncMeta').doc('latest').set({lastSyncAt:new Date().toISOString(),lastSyncBy:user.uid,collections:['products','orders','sales','payments','cars','carLedger','staff','debtEntries']},{merge:true});
+    firestoreLastError='';
+    setCloudMessage('☁️ Firestore Sync: အောင်မြင်ပါသည် — '+new Date().toLocaleString(),true);
+  }catch(e){
+    firestoreLastError=e.message||String(e);
+    console.warn('Firestore sync:',e);
+    setCloudMessage('☁️ Firestore Sync Error — '+firestoreLastError);
+  }finally{firestoreSyncRunning=false;}
+}
+function scheduleFirestoreSync(){
+  clearTimeout(firestoreSyncTimer);
+  firestoreSyncTimer=setTimeout(()=>syncBusinessDataToFirestore(false),700);
+}
+
+function save(){
+ db=normalizeDB(db);
+ try{
+   const old=localStorage.getItem(K); if(old){localStorage.setItem(K+'_lastgood',old);}
+   localStorage.setItem(K,JSON.stringify(db));
+   autoBackupSnapshot();
+   render();
+   renderStaff();
+   scheduleCloudSave();
+   scheduleFirestoreSync();
+ }catch(e){alert('Data သိမ်းရာတွင် ပြဿနာရှိပါသည်။ Backup ကို အရင်လုပ်ပါ။');}
+}
+function autoBackupSnapshot(){
+ try{
+   const key=K+'_auto_'+today();
+   localStorage.setItem(key,JSON.stringify(db));
+   const keys=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(K+'_auto_'))keys.push(k);}
+   keys.sort(); while(keys.length>14){localStorage.removeItem(keys.shift());}
+   const e=document.getElementById('autoBackupStatus'); if(e)e.textContent='✅ Auto Backup: '+today()+' (နောက်ဆုံး 14 ရက်အထိ)';
+ }catch(e){}
+}
+function restoreLastGood(){
+ if(!requireRole('admin'))return;
+ const raw=localStorage.getItem(K+'_lastgood'); if(!raw)return alert('နောက်ဆုံး Backup မတွေ့ပါ။');
+ if(!confirm('နောက်ဆုံးအရန်သိမ်းထားသော data သို့ ပြန်သွားမလား? လက်ရှိ data မတိုင်မီ backup အဖြစ် သိမ်းထားပါမည်။'))return;
+ try{localStorage.setItem(K+'_before_restore',JSON.stringify(db));db=normalizeDB(JSON.parse(raw));save();alert('နောက်ဆုံး Backup မှ data ပြန်ယူပြီးပါပြီ။');}catch(e){alert('Backup ပြန်ယူ၍ မရပါ။');}
+}
+let staffAccessRef=null;
+function setupStaffAccessSync(){
+  if(!liveRTDB)return;
+  try{
+    staffAccessRef=liveRTDB.ref('staffAccess');
+    staffAccessRef.on('value',snap=>{
+      const data=snap.val()||{}; let changed=false;
+      Object.keys(data).forEach(id=>{
+        if(!db.staff.some(x=>x.id===id))return;
+        const active=data[id]?.active;
+        const st=db.staff.find(x=>x.id===id);
+        if(typeof active==='boolean' && st.active!==active){st.active=active;changed=true;}
+      });
+      if(changed){save();renderStaff();}
+      const u=currentStaff();
+      if(u && u.active===false){
+        localStorage.removeItem(K+'_user');
+        document.getElementById('loginGate').style.display='flex';
+        alert('🔒 ဒီဝန်ထမ်း Account ကို Admin က ပိတ်ထားပါသည်။ App ကို ဆက်အသုံးပြု၍ မရတော့ပါ။');
+      }
+    });
+  }catch(e){}
+}
+function pushStaffAccess(st){
+  if(!staffAccessRef || !st)return;
+  staffAccessRef.child(st.id).set({active:st.active!==false,updatedAt:Date.now(),name:st.name,role:st.role}).catch(()=>{});
+}
+function toggleStaffAccess(id){
+  if(!requireRole('admin'))return;
+  const st=db.staff.find(x=>x.id===id); if(!st || id==='OWNER')return;
+  const next=st.active===false;
+  if(!confirm(next?'ဒီဝန်ထမ်း Account ကို ပြန်ဖွင့်မလား?':'ဒီဝန်ထမ်း အလုပ်ထွက်/အသုံးပြုခွင့်ပိတ်မလား?'))return;
+  st.active=next; save(); pushStaffAccess(st); renderStaff();
+  alert(next?'✅ Account ပြန်ဖွင့်ပြီးပါပြီ။':'🔒 Account ပိတ်ပြီးပါပြီ။ အဲဒီဝန်ထမ်းဖုန်းက Sync ရှိပါက အလိုအလျောက် ထွက်သွားပါမည်။');
+}
+function roleName(r){return r==='admin'?'ပိုင်ရှင် / Admin':r==='manager'?'မန်နေဂျာ':r==='driver'?'🚚 ပို့ဆောင်သူ / Driver':'အရောင်း / ငွေကိုင်';}
+function ensureStaffActive(){
+  try{
+    const id=localStorage.getItem(K+'_user');
+    if(!id)return;
+    const u=db && Array.isArray(db.staff) ? db.staff.find(x=>x.id===id) : null;
+    if(!u || u.active===false){
+      localStorage.removeItem(K+'_user');
+      const gate=document.getElementById('loginGate');
+      if(gate)gate.style.display='flex';
+    }
+  }catch(e){
+    localStorage.removeItem(K+'_user');
+    const gate=document.getElementById('loginGate');
+    if(gate)gate.style.display='flex';
+  }
+}
+function currentStaff(){ensureStaffActive();const id=localStorage.getItem(K+'_user');const u=db.staff.find(x=>x.id===id)||null;return u&&u.active!==false?u:null;}
+function requireRole(role){const u=currentStaff();if(!u){alert('ဝန်ထမ်းဝင်ရောက်မှု လိုအပ်ပါသည်။');return false;}const isAdmin=(u.role==='admin'||u.id==='OWNER');const ok=role==='cashier'?(['cashier','manager'].includes(u.role)||isAdmin):role==='manager'?(['manager'].includes(u.role)||isAdmin):role==='delivery'?(['driver','cashier','manager'].includes(u.role)||isAdmin):isAdmin;if(!ok){alert('ဒီလုပ်ဆောင်ချက်အတွက် အသုံးပြုခွင့် မရှိပါ။');return false;}return true;}
+async function loginStaff(){ensureStaffActive();const pin=(document.getElementById('loginPin')?.value||'').trim();const u=db.staff.find(x=>String(x.pin)===pin);if(!u){document.getElementById('loginMsg').textContent='PIN မှားနေပါသည်။';return;}if(u.active===false){document.getElementById('loginMsg').textContent='🔒 ဒီ Account ကို Admin က ပိတ်ထားပါသည်။';return;}localStorage.setItem(K+'_user',u.id);document.getElementById('loginGate').style.display='none';applyEasyMode();renderStaff();render();if(liveRTDB)setupStaffAccessSync();if(orderSyncRef)startDriverOrderNotificationListener();else if(localStorage.getItem('tpg_rtdb_url')&&window.firebase)connectOrderSync();}
+function logoutStaff(){localStorage.removeItem(K+'_user');document.getElementById('loginPin').value='';document.getElementById('loginGate').style.display='flex';applyEasyMode();show('dash');}
+function addStaff(){if(!requireRole('admin'))return;const name=cleanText(document.getElementById('staffName').value),pin=cleanText(document.getElementById('staffPin').value),role=document.getElementById('staffRole').value,driverCar=cleanText(document.getElementById('staffDriverCar')?.value||'');if(!name||!/^[0-9]{4,8}$/.test(pin))return alert('အမည်နှင့် 4–8 လုံး PIN ထည့်ပါ။');if(db.staff.some(x=>x.pin===pin))return alert('ဒီ PIN ကို အသုံးပြုထားပြီးပါပြီ။');if(role==='driver'&&!driverCar)return alert('Driver အတွက် ကားတစ်စီးရွေးပါ။');const st={id:makeId('STF'),name,pin,role,driverCar,active:true};db.staff.push(st);pushStaffAccess(st);save();document.getElementById('staffName').value='';document.getElementById('staffPin').value='';if(document.getElementById('staffDriverCar'))document.getElementById('staffDriverCar').value='';alert('ဝန်ထမ်းထည့်ပြီးပါပြီ။');renderStaff();}
+function removeStaff(id){if(!requireRole('admin'))return;if(id==='OWNER')return alert('မူလ Admin ကို ဖျက်၍မရပါ။');if(!confirm('ဒီဝန်ထမ်းကို ဖျက်မလား?'))return;db.staff=db.staff.filter(x=>x.id!==id);save();}
+function renderStaff(){ensureStaffActive();const u=currentStaff();const info=document.getElementById('currentUserInfo');if(info)info.innerHTML=u?`လက်ရှိဝင်ထားသူ - <b>${esc(u.name)}</b> (${roleName(u.role)}) <button class="smallbtn" onclick="logoutStaff()">ထွက်မည်</button>`:'';const carSel=document.getElementById('staffDriverCar');if(carSel){const cars=db.carList||[];carSel.innerHTML='<option value="">ကားမရွေးရသေးပါ</option>'+cars.map(c=>`<option value="${esc(c)}">${esc(db.carNames?.[c]||c)}</option>`).join('');}const t=document.getElementById('staffList');if(t)t.innerHTML=db.staff.map(x=>{const active=x.active!==false;return `<tr><td>${esc(x.name)}</td><td>${roleName(x.role)}${x.role==='driver'&&x.driverCar?`<br>🚚 ${esc(db.carNames?.[x.driverCar]||x.driverCar)}`:''}</td><td>${active?'🟢 အသုံးပြုနိုင်':'🔴 ပိတ်ထား'}</td><td>${x.id==='OWNER'?'-':`<button class="smallbtn ${active?'danger':''}" onclick="toggleStaffAccess('${esc(x.id)}')">${active?'🔒 ပိတ်ရန်':'🔓 ပြန်ဖွင့်ရန်'}</button> <button class="smallbtn danger" onclick="removeStaff('${esc(x.id)}')">ဖျက်</button>`}</td></tr>`;}).join('');}
+function easyAllowedSection(id){
+ const u=currentStaff(); if(!u)return id==='dash';
+ const admin=(u.role==='admin'||u.id==='OWNER');
+ if(admin)return true;
+ // Manager: operational + management tools, but no backup/staff administration.
+ if(u.role==='manager')return ['dash','order','orders','customer','product','sale','car','liveMapSection','reports'].includes(id);
+ // Cashier/normal staff: only the features needed for daily shop work.
+ if(u.role==='cashier')return ['dash','order','orders','customer','sale'].includes(id);
+ // Driver: only Home and Orders/Delivery.
+ if(u.role==='driver')return ['dash','orders'].includes(id);
+ return ['dash','orders'].includes(id);
+}
+function applyEasyMode(){
+ const u=currentStaff();
+ const bar=document.getElementById('easyModeBar');
+ const quick=document.getElementById('easyQuickActions');
+ if(!u){if(bar)bar.style.display='none';return;}
+ const admin=(u.role==='admin'||u.id==='OWNER');
+ if(bar)bar.style.display='flex';
+ const info=document.getElementById('easyModeUser');
+ if(info)info.innerHTML='👤 <b>'+esc(u.name||'ဝန်ထမ်း')+'</b> — '+esc(roleName(u.role));
+ document.querySelectorAll('.easy-nav').forEach(btn=>{const sec=btn.getAttribute('data-section');btn.classList.toggle('easy-hidden',!easyAllowedSection(sec));});
+ // Technical/administrative areas are not shown to normal staff.
+ document.querySelectorAll('[data-admin-only-ui]').forEach(el=>el.style.display=admin?'':'none');
+ // Main screen: hide non-essential management information for normal staff.
+ document.querySelectorAll('[data-admin-manager-home]').forEach(el=>{
+   const showIt=admin || u.role==='manager';
+   el.classList.toggle('staff-home-hide',!showIt);
+ });
+ document.querySelectorAll('.driver-home-hide').forEach(el=>{
+   el.style.display=(u.role==='driver')?'none':'';
+ });
+ // Normal Staff/Cashier Home: show only the simple daily dashboard.
+ document.querySelectorAll('.staff-simple-hide').forEach(el=>{
+   el.style.display=(u.role==='cashier' && !admin)?'none':'';
+ });
+ if(quick){quick.style.display=u.role==='driver'?'none':'block';}
+ // Hide technical/management navigation for normal staff; restore automatically for Admin.
+ document.querySelectorAll('.easy-nav').forEach(btn=>{
+   const sec=btn.getAttribute('data-section');
+   btn.classList.toggle('easy-hidden',!easyAllowedSection(sec));
+ });
+}
+function applyAdminBuyVisibility(){
+  const u=currentStaff();
+  const isAdmin = !!u && (String(u.role||'').toLowerCase()==='admin' || String(u.id||'').toUpperCase()==='OWNER');
+  document.querySelectorAll('.admin-buy-only').forEach(el=>{
+    // Keep table cells as table-cell; using inline-block here shifts the Buy/Sell columns.
+    let display='none';
+    if(isAdmin){
+      const tag=el.tagName.toLowerCase();
+      display=(tag==='td'||tag==='th') ? 'table-cell' : 'inline-block';
+    }
+    el.style.setProperty('display', display, 'important');
+  });
+  const buyBox=document.getElementById('buyAdminOnly');
+  if(buyBox) buyBox.style.setProperty('display', isAdmin ? 'block' : 'none', 'important');
+  const status=document.getElementById('buyPriceStatus');
+  if(status) status.textContent=isAdmin ? '(Admin — ဝယ်ဈေး မြင်ရသည်)' : '(ဝယ်ဈေးကို ဖျောက်ထားသည်)';
+}
+
+function show(id){
+ if(!easyAllowedSection(id)){alert('ဒီအပိုင်းကို အသုံးပြုခွင့် မရှိပါ။');return;}
+ ['dash','order','orders','customer','product','sale','car','liveMapSection','reports','backup','staff'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id));
+ applyEasyMode();
+  applyAdminBuyVisibility();
+ if(id==='orders')renderOrders(); if(id==='customer'){document.getElementById('creditPaymentDate').value=today();renderCustomers();} if(id==='reports')report(); if(id==='staff'){if(!requireRole('admin'))return;renderStaff();}
+}
+function nextOrderId(){
+ const d=today().replaceAll('-','');
+ const n=db.orders.filter(o=>o.id?.startsWith('ORD-'+d)).length+1;
+ return 'ORD-'+d+'-'+String(n).padStart(3,'0');
+}
+function fillProducts(){
+ const opts=db.products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+ const op=document.getElementById('oproduct');
+ const spEl=document.getElementById('sp');
+ if(op) op.innerHTML=opts;
+ if(spEl) spEl.innerHTML=opts;
+}
+function orderPrice(){
+ const op=document.getElementById('oproduct');
+ const pr=document.getElementById('oprice');
+ if(!op||!pr)return;
+ const p=db.products.find(x=>x.id===op.value);
+ pr.value=p?p.sell:0;
+}
+let orderItems=[];
+function addOrderItem(){if(!db.products.length)return alert('အရင်ဆုံး ကုန်ပစ္စည်းထည့်ပါ။');orderItems.push({pid:'',qty:1,variant:'',price:0,discount:0});renderOrderItems();}
+function removeOrderItem(i){orderItems.splice(i,1);renderOrderItems();}
+function orderProductType(i,value){const v=(value||'').trim().toLowerCase();const p=db.products.find(x=>(x.name||'').toLowerCase()===v || (x.name+(x.type?' - '+x.type:'')).toLowerCase()===v);if(p){orderItems[i].pid=p.id;orderItems[i].price=+p.sell||0;renderOrderItems();}}
+function orderItemChange(i,k,v){orderItems[i][k]=k==='pid'?v:(k==='variant'?v:(Number(v)||0));if(k==='pid'){let p=db.products.find(p=>p.id===v);orderItems[i].price=p?.sell||0;}renderOrderItems();}
+function renderOrderItems(){let t=document.getElementById('orderItems');if(!t)return;const list=db.products;t.innerHTML=orderItems.map((it,i)=>{const current=db.products.find(p=>p.id===it.pid);const label=current?current.name+(current.type?' - '+current.type:''):'';return `<tr><td>${i+1}</td><td><input type="text" list="orderProductList${i}" value="${esc(label)}" placeholder="ပစ္စည်းအမည် ရိုက်ပါ" autocomplete="off" oninput="orderProductType(${i},this.value)"><datalist id="orderProductList${i}">${list.map(p=>`<option value="${esc(p.name)}"></option>`).join('')}</datalist></td><td><input type="number" min="1" value="${it.qty}" onchange="orderItemChange(${i},'qty',this.value)"></td><td><input value="${it.variant||''}" onchange="orderItemChange(${i},'variant',this.value)"></td><td><input type="number" value="${it.price}" onchange="orderItemChange(${i},'price',this.value)"></td><td><input type="number" value="${it.discount||0}" onchange="orderItemChange(${i},'discount',this.value)"></td><td>${M(Math.max(0,(it.qty||0)*(it.price||0)-(it.discount||0)))}</td><td><button class="smallbtn danger" onclick="removeOrderItem(${i})">ဖယ်</button></td></tr>`}).join('')||'<tr><td colspan="8">+ ပစ္စည်းထည့်ရန် ကိုနှိပ်ပါ။</td></tr>';updateOrderTotal();}
+function updateOrderTotal(){let itemsTotal=orderItems.reduce((a,x)=>a+Math.max(0,(+x.qty||0)*(+x.price||0)-(+x.discount||0)),0),delivery=+(document.getElementById('odeliveryFee')?.value||0),labor=+(document.getElementById('olaborFee')?.value||0),total=itemsTotal+delivery+labor,p=+(opaid.value||0);if(opay.value==='cash')p=total;if(opay.value==='credit')p=0;orderGrandTotal.textContent=M(total);obalance.value=Math.max(0,total-p);return total;}
+function updateOrderCustomerBalance(){
+ const el=document.getElementById('orderCustomerBalance');
+ const input=document.getElementById('obuyer');
+ if(!el||!input)return;
+ const name=(input.value||'').trim().toLowerCase();
+ if(!name){el.innerHTML='ယခင်ရရန်ရှိငွေ: <b>0 Ks</b>';return;}
+ const matches=db.orders.filter(o=>(o.customer||'').trim().toLowerCase()===name);
+ const balance=matches.reduce((sum,o)=>sum+(Number(o.balance)!=null?Number(o.balance):Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0))),0);
+ const total=matches.reduce((sum,o)=>sum+(Number(o.total)||0),0);
+ const paid=matches.reduce((sum,o)=>sum+(Number(o.paid)||0),0);
+ if(matches.length){
+   el.innerHTML=`👤 ${esc(input.value.trim())} — ယခင် Order ${matches.length} ခု | Total: ${M(total)} Ks | Paid: ${M(paid)} Ks | <span style="color:#b00020">ရရန်ရှိငွေ: ${M(balance)} Ks</span>`;
+ }else{
+   el.innerHTML='အသစ်ဝယ်သူ / ယခင်ရရန်ရှိငွေ: <b>0 Ks</b>';
+ }
+}
+function clearOrder(){['ovoucher','obuyer','ophone','oaddress','ocourier','otracking','onote'].forEach(id=>document.getElementById(id).value='');orderItems=[];opaid.value=0;expected.value=today();odate.value=today();oid.value=nextOrderId();document.getElementById('odeliveryFee').value=0;document.getElementById('olaborFee').value=0;document.getElementById('odeliveryCar').value='';renderOrderItems();updateOrderCustomerBalance();}
+function addOrder(){if(!requireRole('cashier'))return;if(!orderItems.length)return alert('အနည်းဆုံး ပစ္စည်း ၁ မျိုးထည့်ပါ');if(orderItems.some(x=>!x.pid))return alert('ပစ္စည်းအမည် ရွေးပါ');let total=updateOrderTotal(),paid=+(opaid.value||0);if(opay.value==='cash')paid=total;if(opay.value==='credit')paid=0;let first=orderItems[0];db.orders.push({id:oid.value,date:odate.value||today(),customer:obuyer.value.trim(),phone:ophone.value.trim(),address:oaddress.value.trim(),items:orderItems.map(x=>({...x})),pid:first.pid,product:db.products.find(p=>p.id===first.pid)?.name||'',qty:orderItems.reduce((a,x)=>a+(+x.qty||0),0),variant:first.variant||'',total,deliveryFee:+(document.getElementById('odeliveryFee').value||0),laborFee:+(document.getElementById('olaborFee').value||0),paid,balance:Math.max(0,total-paid),expected:expected.value||today(),deliveryCar:document.getElementById('odeliveryCar').value||'',courier:ocourier.value.trim(),tracking:otracking.value.trim(),status:opay.value==='cash'?'Confirmed':'New',note:onote.value.trim(),packed:false,shippedDate:'',deliveredDate:''});const newOrder=db.orders[db.orders.length-1];save();if(!orderSyncRef){const url=getConfiguredRTDBUrl();if(url&&window.firebase)connectOrderSync();}if(orderSyncRef)notifyAssignedDriver(newOrder);alert('Order သိမ်းပြီးပါပြီ — '+oid.value);clearOrder();}
+function changeStatus(i,v){
+  const u=currentStaff();
+  if(u?.role==='driver'){
+    if(v==='Delivered'){ markOrderDelivered(i); }
+    else { alert('🚚 Driver အနေဖြင့် “ပစ္စည်းပို့ပြီး” အခြေအနေတစ်ခုတည်းကိုသာ သတ်မှတ်နိုင်ပါသည်။'); renderOrders(); }
+    return;
+  }
+  if(!requireRole('cashier'))return;
+  const o=db.orders[i]; if(!o)return;
+  o.status=v;
+  if(v==='Delivered') o.deliveredDate=today();
+  o.deliveryUpdatedAt=Date.now();
+  o.deliverySyncAt=o.deliveryUpdatedAt;
+  save();
+  if(!orderSyncRef){
+    const url=localStorage.getItem('tpg_rtdb_url')||'';
+    if(url)connectOrderSync();
+  }
+  if(orderSyncRef)pushOrderDeliveryStatus(o,v);
+  renderOrders();
+}
+function editOrder(i){
+ const u=currentStaff();
+ if(u?.role==='driver'){alert('🚚 Driver အနေဖြင့် “ပစ္စည်းပို့ပြီး” သတ်မှတ်ခြင်းမှလွဲ၍ Order ကို ပြင်ဆင်ခွင့်မရှိပါ။');return;}
+ if(!requireRole('cashier'))return;
+ const o=db.orders[i];
+ const s=prompt('Status ပြောင်းရန်\nNew, Confirmed, Preparing, Packed, Shipped, လမ်းတွင်, Out for Delivery, Delivered, On Hold, Delivery Failed, Returned, Cancelled',o.status||'New');
+ if(s===null) return;
+ const paidInput=prompt('ရပြီးငွေ (Paid) ကို ပြင်ရန် — ဥပမာ 50000', String(Number(o.paid)||0));
+ if(paidInput===null) return;
+ const noteInput=prompt('Note ကို ပြင်ရန်', o.note||'');
+ if(noteInput===null) return;
+ let paid=Number(paidInput);
+ if(!Number.isFinite(paid)||paid<0) return alert('Paid ငွေပမာဏ မှားနေပါတယ်။ 0 သို့မဟုတ် အပြုသဘောနံပါတ် ထည့်ပါ။');
+ const total=Number(o.total)||0;
+ if(paid>total) return alert('Paid သည် Order Total ထက် မများရပါ။');
+ o.status=s.trim()||o.status||'New';
+ o.paid=paid;
+ o.balance=Math.max(0,total-paid);
+ o.note=noteInput;
+ if(o.status==='Delivered') o.deliveredDate=today();
+ save();
+ renderOrders();
+}
+function deleteOrder(i){if(!requireRole('cashier'))return;if(confirm('ဒီ Order ကို ဖျက်မှာသေချာပါသလား?')){db.orders.splice(i,1);save();renderOrders();}}
+function isအချိန်ကျော်(o){return o.status!=='Delivered'&&o.status!=='Cancelled'&&o.status!=='Returned'&&o.expected<today()}
+function editOrderDeliveryCar(i, value){
+  const u=currentStaff();
+  if(!u){alert('ဝန်ထမ်းဝင်ရောက်မှု လိုအပ်ပါသည်။'); return;}
+  if(u.role==='driver'){alert('🚚 Driver အနေဖြင့် ပို့ပြီးကြောင်းသတ်မှတ်ခြင်းမှလွဲ၍ ကား/Order အချက်အလက်ကို ပြင်ခွင့်မရှိပါ။'); renderOrders(); return;}
+  const o=db.orders[i];
+  if(!o)return alert('Order မတွေ့ပါ။');
+  const car=cleanText(value);
+  if(car && !db.carList.includes(car))return alert('ရွေးထားသောကား မရှိတော့ပါ။');
+  o.deliveryCar=car;
+  o.updatedAt=new Date().toISOString();
+  save();
+  renderOrders();
+  if(typeof render==='function')render();
+}
+function renderOrders(){
+ const q=(orderSearch.value||'').trim().toLowerCase(), f=statusFilter.value;
+ const all=db.orders.map((o,i)=>({o,i}));
+ const customerMatches=q ? all.filter(({o})=>(o.customer||'').trim().toLowerCase().includes(q)) : [];
+ const arr=all.filter(({o})=>
+   (!f||o.status===f) &&
+   (!q||[o.id,o.voucherNo,o.customer,o.phone,o.address,o.tracking,o.courier,o.note,o.product,...(o.items||[]).map(x=>db.products.find(p=>p.id===x.pid)?.name||x.pid)].join(' ').toLowerCase().includes(q))
+ ).reverse();
+ const u=currentStaff(); const isDriver=u?.role==='driver';
+ const grandTotal=arr.reduce((sum,{o})=>sum+(Number(o.total)||0),0);
+ const grandPaid=arr.reduce((sum,{o})=>sum+(Number(o.paid)||0),0);
+ const grandBalance=arr.reduce((sum,{o})=>sum+(Number(o.balance)!=null?Number(o.balance):Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0))),0);
+ const box=document.getElementById('orderCustomerGrandTotal');
+ if(box){
+   if(q && customerMatches.length){
+     const names=[...new Set(customerMatches.map(({o})=>(o.customer||'').trim()).filter(Boolean))];
+     const ct=customerMatches.reduce((sum,{o})=>sum+(Number(o.total)||0),0);
+     const cp=customerMatches.reduce((sum,{o})=>sum+(Number(o.paid)||0),0);
+     const cb=customerMatches.reduce((sum,{o})=>sum+(Number(o.balance)!=null?Number(o.balance):Math.max(0,(Number(o.total)||0)-(Number(o.paid)||0))),0);
+     box.innerHTML=`👤 <b>${esc(names.join(', '))}</b> &nbsp; | &nbsp; Order: ${customerMatches.length} ခု &nbsp; | &nbsp; Total: ${M(ct)} Ks &nbsp; | &nbsp; ရပြီးငွေ: ${M(cp)} Ks &nbsp; | &nbsp; <span style="color:#b00020">ရရန်ရှိငွေ Grand Total: ${M(cb)} Ks</span>`;
+   }else{
+     box.innerHTML=`📊 လက်ရှိစာရင်း Grand Total — Total: ${M(grandTotal)} Ks &nbsp; | &nbsp; ရပြီးငွေ: ${M(grandPaid)} Ks &nbsp; | &nbsp; <span style="color:#b00020">ရရန်ရှိငွေ: ${M(grandBalance)} Ks</span>`;
+   }
+ }
+ ordersBody.innerHTML=arr.map(({o,i})=>{
+   const over=isအချိန်ကျော်(o);
+   return `<tr class="${o.status==='Delivered'?'delivered-row':(over?'overdue':'')}">
+    <td><b>${esc(o.id)}</b><br><small>Voucher: ${esc(o.voucherNo||'-')}</small></td><td>${esc(o.date)}</td><td>${esc(o.customer)}<br>${esc(o.phone)}</td>
+    <td style="white-space:normal;min-width:180px">${esc(o.address||'-')}</td>
+    <td style="min-width:150px">${(()=>{const ids=Array.isArray(db.carList)?db.carList:[]; return `<select class="order-car-select" data-order-index="${i}" style="min-width:135px;padding:6px;border-radius:6px;border:1px solid #bbb" onchange="editOrderDeliveryCar(${i},this.value)" ${(!isDriver && currentStaff())?'':'disabled'}><option value="">ကားမရွေးထားပါ</option>${ids.map(id=>`<option value="${esc(id)}" ${id===o.deliveryCar?'selected':''}>${esc(db.carNames[id]||id)}</option>`).join('')}</select><small style="display:block;margin-top:3px;color:#666">${isDriver?'Driver — ပို့ပြီးကြောင်းသာ သတ်မှတ်နိုင်သည်':(currentStaff()?'Admin/Staff ပြင်နိုင်သည်':'Login လိုအပ်သည်')}</small>`})()}</td>
+    <td style="white-space:normal">${Array.isArray(o.items)?o.items.map(x=>esc((db.products.find(p=>p.id===x.pid)?.name||x.pid)+' × '+x.qty+(x.variant?' / '+x.variant:''))).join('<br>'):esc((o.product||'-')+' '+(o.variant||''))}</td><td>${o.qty||0}</td><td>${M(o.total)}</td><td>${M(o.paid)}</td><td>${M(o.balance)}</td>
+    <td>${esc(o.expected||'-')}${over?' 🔴':''}</td><td style="white-space:normal;min-width:150px">${esc(o.courier||'-')}${o.tracking?'<br>📦 '+esc(o.tracking):''}</td>
+    <td style="white-space:normal;min-width:180px">${esc(o.note||'-')}</td>
+    <td>${isDriver ? (o.status==='Delivered' ? '<span class="delivered">🟢 ပစ္စည်းပို့ပြီး</span>' : '<span>🚚 '+esc(o.status||'-')+'</span><br><button class="smallbtn success" onclick="markOrderDelivered('+i+')">✅ ပစ္စည်းပို့ပြီး</button>') : `<select class="status" onchange="changeStatus(${i},this.value)">${['New','Confirmed','Preparing','Packed','Shipped','လမ်းတွင်','Out for Delivery','Delivered','On Hold','Delivery Failed','Returned','Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select>`}
+    </select></td>
+    <td>${isDriver ? (o.status==='Delivered' ? '<span class="delivered" style="padding:5px 7px;border-radius:6px;font-weight:bold">🟢 ပို့ပြီး</span>' : '<button class="smallbtn success" onclick="markOrderDelivered('+i+')">✅ ပစ္စည်းပို့ပြီး</button>') : (o.status==='Delivered'?'<span class="delivered" style="padding:5px 7px;border-radius:6px;font-weight:bold">✅ ပို့ပြီး</span>':'<button class="smallbtn success" onclick="markOrderDelivered('+i+')">✅ ပစ္စည်းပို့ပြီး</button>') }<br><button class="smallbtn" onclick="printVoucher('order',${i})">🖨️ ပုံနှိပ်ရန်</button>${isDriver?'':'<button class="smallbtn" onclick="editOrder('+i+')">ပြင်ဆင်ရန်</button><button class="smallbtn danger" onclick="deleteOrder('+i+')">ဖျက်</button>'}</td>
+   </tr>`;
+ }).join('')||'<tr><td colspan="15">Order မတွေ့ပါ။</td></tr>';
+}
+function customerLedger(name){
+ const n=(name||'').trim().toLowerCase();
+ const orders=db.orders.filter(o=>(o.customer||'').trim().toLowerCase()===n);
+ const sales=db.sales.filter(x=>(x.buyer||'').trim().toLowerCase()===n);
+ const payments=(db.payments||[]).filter(x=>(x.customer||'').trim().toLowerCase()===n);
+ const debts=(db.debtEntries||[]).filter(x=>(x.customer||'').trim().toLowerCase()===n);
+ const orderTotal=orders.reduce((a,o)=>a+(Number(o.total)||0),0), orderPaid=orders.reduce((a,o)=>a+(Number(o.paid)||0),0);
+ const saleTotal=sales.reduce((a,x)=>a+(Number(x.total)||0),0), salePaid=sales.reduce((a,x)=>a+(Number(x.paid)||0),0);
+ const debtTotal=debts.reduce((a,x)=>a+(Number(x.total)||0),0), debtPaid=debts.reduce((a,x)=>a+(Number(x.paid)||0),0);
+ const paymentTotal=payments.reduce((a,x)=>a+(Number(x.amount)||0),0);
+ const total=orderTotal+saleTotal+debtTotal, paid=orderPaid+salePaid+debtPaid+paymentTotal, balance=Math.max(0,total-paid);
+ return {orders,sales,payments,debts,orderTotal,orderPaid,saleTotal,salePaid,debtTotal,debtPaid,paymentTotal,total,paid,balance};
+}
+function addCustomerPayment(){if(!requireRole('cashier'))return;
+ const name=(document.getElementById('creditCustomerName')?.value||'').trim();
+ const amount=Number(document.getElementById('creditPaymentAmount')?.value||0);
+ const date=document.getElementById('creditPaymentDate')?.value||today();
+ const note=(document.getElementById('creditPaymentNote')?.value||'').trim();
+ if(!name)return alert('ဝယ်သူအမည်ထည့်ပါ');
+ if(!amount||amount<=0)return alert('ပေးချေငွေ ပမာဏထည့်ပါ');
+ const led=customerLedger(name);
+ if(led.balance<=0)return alert('ဒီဝယ်သူမှာ ရရန်ရှိငွေ မရှိပါ။');
+ if(amount>led.balance && !confirm('ထည့်မည့်ငွေက ရရန်ရှိငွေထက်များနေပါတယ်။ ဆက်သိမ်းမလား?'))return;
+ db.payments.push({id:'PAY-'+Date.now(),date,customer:name,phone:'',amount,note,voucherNo:''});
+ save();
+ document.getElementById('creditPaymentAmount').value='';
+ document.getElementById('creditPaymentNote').value='';
+ document.getElementById('creditCustomerName').value=name;
+ renderCustomers();
+ alert('အကြွေးပေးချေမှု သိမ်းပြီးပါပြီ။');
+}
+function openDebtEditor(kind,id){
+ const u=currentStaff();
+ if(!u || (u.role!=='admin' && u.id!=='OWNER')){alert('🔒 Admin Account ဖြင့် ဝင်ရောက်ပြီးမှ အကြွေးစာရင်းကို ပြင်နိုင်ပါသည်။');return;}
+ const arr=kind==='order'?db.orders:kind==='sale'?db.sales:db.debtEntries;
+ const x=(arr||[]).find(v=>v.id===id); if(!x){alert('အကြွေးစာရင်း မတွေ့ပါ။');return;}
+ document.getElementById('debtEditKind').value=kind;
+ document.getElementById('debtEditId').value=id;
+ document.getElementById('debtEditCustomer').value=kind==='sale'?(x.buyer||''):kind==='order'?(x.customer||''):(x.customer||'');
+ document.getElementById('debtEditTotal').value=Number(x.total)||0;
+ document.getElementById('debtEditPaid').value=Number(x.paid)||0;
+ document.getElementById('debtEditBalance').value=Math.max(0,(Number(x.total)||0)-(Number(x.paid)||0));
+ document.getElementById('debtEditNote').value=x.note||'';
+ document.getElementById('debtEditTitle').textContent='✏️ အကြွေးစာရင်းပြင်ရန် — '+(kind==='order'?'အော်ဒါ':kind==='sale'?'အရောင်း':'Admin အကြွေး');
+ const modal=document.getElementById('debtEditModal'); modal.style.display='flex';
+}
+function closeDebtEditor(){const m=document.getElementById('debtEditModal');if(m)m.style.display='none';}
+function updateDebtEditorBalance(){const t=Number(document.getElementById('debtEditTotal').value)||0,p=Number(document.getElementById('debtEditPaid').value)||0;document.getElementById('debtEditBalance').value=Math.max(0,t-p);}
+function saveDebtEditor(){
+ const u=currentStaff(); if(!u || (u.role!=='admin'&&u.id!=='OWNER')){alert('🔒 Admin Account ဖြင့်သာ ပြင်နိုင်ပါသည်။');return;}
+ const kind=document.getElementById('debtEditKind').value,id=document.getElementById('debtEditId').value;
+ const arr=kind==='order'?db.orders:kind==='sale'?db.sales:db.debtEntries; const x=(arr||[]).find(v=>v.id===id); if(!x){alert('စာရင်းမတွေ့ပါ။');return;}
+ const total=Number(document.getElementById('debtEditTotal').value),paid=Number(document.getElementById('debtEditPaid').value);
+ if(!Number.isFinite(total)||total<0){alert('စုစုပေါင်းငွေ မမှန်ပါ။');return;}
+ if(!Number.isFinite(paid)||paid<0||paid>total){alert('ပေးပြီးငွေ မမှန်ပါ။');return;}
+ const old={total:Number(x.total)||0,paid:Number(x.paid)||0}; x.total=total;x.paid=paid;
+ if(kind==='order')x.balance=total-paid;
+ else if(kind==='sale'){x.credit=total-paid;x.balance=total-paid;}
+ else {x.balance=total-paid;x.note=(document.getElementById('debtEditNote').value||'').trim();}
+ db.audit=db.audit||[];db.audit.push({time:new Date().toISOString(),user:u.name||'Admin',action:'edit debt',kind,id,old,new:{total,paid}});
+ save();closeDebtEditor();renderCustomers();render();alert('✅ အကြွေးစာရင်း ပြင်ပြီးပါပြီ။');
+}
+function adminEditDebt(kind,id){openDebtEditor(kind,id);}
+function adminDeleteDebtSource(kind,id){
+ if(!requireRole('admin'))return;
+ const arr=kind==='order'?db.orders:kind==='sale'?db.sales:db.debtEntries;
+ const i=(arr||[]).findIndex(v=>String(v.id)===String(id));
+ if(i<0)return alert('အကြွေးစာရင်း မတွေ့ပါ။');
+ const x=arr[i];
+ if(!confirm('ဒီအကြွေးစာရင်းကို ဖျက်မလား?\n'+(x.customer||x.buyer||'')+' — '+M(x.total||0)+' Ks'))return;
+ db.deletedDebtSources=db.deletedDebtSources||[];
+ db.deletedDebtSources.unshift({kind,data:{...x},deletedAt:Date.now(),deletedBy:currentStaff()?.name||'Admin'});
+ db.deletedDebtSources=db.deletedDebtSources.slice(0,100);
+ arr.splice(i,1);
+ db.audit=db.audit||[]; db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'delete debt source',kind,id});
+ save(); renderCustomers(); render(); alert('🗑️ အကြွေးစာရင်း ဖျက်ပြီးပါပြီ။ ♻️ ပြန်ခေါ်နိုင်ပါသည်။');
+}
+function restoreDeletedDebtSource(index){
+ if(!requireRole('admin'))return;
+ const a=db.deletedDebtSources||[]; const x=a[index]; if(!x)return;
+ const arr=x.kind==='order'?db.orders:x.kind==='sale'?db.sales:db.debtEntries;
+ if((arr||[]).some(v=>String(v.id)===String(x.data.id)))return alert('ဒီ ID ရှိပြီးသားဖြစ်နေပါသည်။');
+ arr.push(x.data); a.splice(index,1);
+ db.audit=db.audit||[]; db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'restore debt source',kind:x.kind,id:x.data.id});
+ save(); renderCustomers(); render(); alert('♻️ အကြွေးစာရင်း ပြန်ခေါ်ပြီးပါပြီ။');
+}
+function adminEditPayment(id){if(!requireRole('admin'))return;const x=(db.payments||[]).find(v=>v.id===id);if(!x)return alert('ပေးချေမှုမှတ်တမ်း မတွေ့ပါ။');const v=prompt('အကြွေးပေးချေငွေကို ပြင်ပါ။',String(x.amount||0));if(v===null)return;const amount=Number(v);if(!Number.isFinite(amount)||amount<0)return alert('ငွေပမာဏ မမှန်ပါ။');const old=x.amount;x.amount=amount;db.audit=db.audit||[];db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'edit payment',id,oldAmount:old,newAmount:amount});save();renderCustomers();render();alert('ပေးချေမှုစာရင်း ပြင်ပြီးပါပြီ။');}
+function adminAddDebt(){
+ if(!requireRole('admin'))return;
+ const customer=prompt('ဝယ်သူအမည်ထည့်ပါ။',''); if(customer===null||!customer.trim())return;
+ const total=Number(prompt('အကြွေးစုစုပေါင်း (Ks) ထည့်ပါ။','0')); if(!Number.isFinite(total)||total<=0)return alert('အကြွေးပမာဏ မမှန်ပါ။');
+ const paid=Number(prompt('ယခုပေးပြီးငွေ (Ks) ထည့်ပါ။','0')); if(!Number.isFinite(paid)||paid<0||paid>total)return alert('ပေးပြီးငွေ မမှန်ပါ။');
+ const note=prompt('မှတ်ချက် (မဖြည့်လည်းရသည်)','')||'';
+ db.debtEntries=db.debtEntries||[]; db.debtEntries.push({id:makeId('DEBT'),date:today(),customer:customer.trim(),total,paid,note,createdBy:currentStaff()?.name||'Admin'});
+ db.audit=db.audit||[]; db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'add debt',customer:customer.trim(),total,paid});
+ save(); renderCustomers(); render(); alert('✅ အကြွေးစာရင်းအသစ် ထည့်ပြီးပါပြီ။');
+}
+function adminEditManualDebt(id){
+ if(!requireRole('admin'))return; const x=(db.debtEntries||[]).find(v=>v.id===id); if(!x)return alert('အကြွေးစာရင်း မတွေ့ပါ။');
+ const total=Number(prompt('အကြွေးစုစုပေါင်း (Ks)',String(x.total||0))); if(!Number.isFinite(total)||total<=0)return alert('ပမာဏ မမှန်ပါ။');
+ const paid=Number(prompt('ပေးပြီးငွေ (Ks)',String(x.paid||0))); if(!Number.isFinite(paid)||paid<0||paid>total)return alert('ပေးပြီးငွေ မမှန်ပါ။');
+ const old={total:x.total,paid:x.paid}; x.total=total; x.paid=paid;
+ db.audit=db.audit||[]; db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'edit manual debt',id,old,new:{total,paid}}); save(); renderCustomers(); render();
+}
+function adminDeleteManualDebt(id){
+ if(!requireRole('admin'))return; const i=(db.debtEntries||[]).findIndex(v=>v.id===id); if(i<0)return; const x=db.debtEntries[i]; if(!confirm('ဒီအကြွေးစာရင်းကို ဖျက်မလား?\n'+x.customer+' — '+M(x.total)+' Ks'))return;
+ db.deletedDebtEntries=db.deletedDebtEntries||[]; db.deletedDebtEntries.unshift({...x,deletedAt:Date.now(),deletedBy:currentStaff()?.name||'Admin'}); db.deletedDebtEntries=db.deletedDebtEntries.slice(0,50); db.debtEntries.splice(i,1);
+ db.audit=db.audit||[]; db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'delete manual debt',id,customer:x.customer,total:x.total}); save(); renderCustomers(); render(); alert('အကြွေးစာရင်း ဖျက်ပြီးပါပြီ။ ပြန်ခေါ်နိုင်ပါသည်။');
+}
+function adminEditPayment(id){if(!requireRole('admin'))return;const x=(db.payments||[]).find(v=>v.id===id);if(!x)return alert('ပေးချေမှုမှတ်တမ်း မတွေ့ပါ။');const v=prompt('အကြွေးပေးချေငွေကို ပြင်ပါ။',String(x.amount||0));if(v===null)return;const amount=Number(v);if(!Number.isFinite(amount)||amount<0)return alert('ငွေပမာဏ မမှန်ပါ။');const old=x.amount;x.amount=amount;db.audit=db.audit||[];db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'edit payment',id,oldAmount:old,newAmount:amount});save();renderCustomers();render();alert('ပေးချေမှုစာရင်း ပြင်ပြီးပါပြီ။');}
+function adminDeletePayment(id){if(!requireRole('admin'))return;const i=(db.payments||[]).findIndex(v=>v.id===id);if(i<0)return;const x=db.payments[i];if(!confirm('ဒီအကြွေးပေးချေမှုကို ဖျက်မလား?\n'+(x.customer||'')+' — '+M(x.amount)+' Ks'))return;db.deletedPayments=db.deletedPayments||[];db.deletedPayments.unshift({...x,deletedAt:Date.now(),deletedBy:currentStaff()?.name||'Admin'});db.deletedPayments=db.deletedPayments.slice(0,50);db.payments.splice(i,1);db.audit=db.audit||[];db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'delete payment',id,customer:x.customer,amount:x.amount});save();renderCustomers();render();alert('ပေးချေမှုမှတ်တမ်း ဖျက်ပြီးပါပြီ။ ပြန်ခေါ်နိုင်ပါသည်။');}
+function restoreDeletedPayment(id){if(!requireRole('admin'))return;const i=(db.deletedPayments||[]).findIndex(v=>v.id===id);if(i<0)return;const x=db.deletedPayments[i];const restored={...x};delete restored.deletedAt;delete restored.deletedBy;db.payments.push(restored);db.deletedPayments.splice(i,1);db.audit=db.audit||[];db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'restore payment',id});save();renderCustomers();render();}
+function restoreDeletedDebt(id){if(!requireRole('admin'))return;const i=(db.deletedDebtEntries||[]).findIndex(v=>v.id===id);if(i<0)return;const x=db.deletedDebtEntries[i];const restored={...x};delete restored.deletedAt;delete restored.deletedBy;db.debtEntries.push(restored);db.deletedDebtEntries.splice(i,1);db.audit=db.audit||[];db.audit.push({time:new Date().toISOString(),user:currentStaff()?.name||'Admin',action:'restore debt',id});save();renderCustomers();render();}
+
+document.addEventListener('click',function(e){
+ const b=e.target.closest && e.target.closest('[data-debt-action]');
+ if(!b)return;
+ e.preventDefault(); e.stopPropagation();
+ const action=b.getAttribute('data-debt-action'), kind=b.getAttribute('data-debt-kind'), id=b.getAttribute('data-debt-id');
+ if(action==='edit') openDebtEditor(kind,id);
+ else if(action==='delete') kind==='manual'?adminDeleteManualDebt(id):adminDeleteDebtSource(kind,id);
+ else if(action==='edit-payment') adminEditPayment(id);
+ else if(action==='delete-payment') adminDeletePayment(id);
+});
+document.addEventListener('input',function(e){if(e.target && (e.target.id==='debtEditTotal'||e.target.id==='debtEditPaid'))updateDebtEditorBalance();});
+
+function renderCustomers(){
+ const q=(customerSearch.value||'').toLowerCase().trim();
+ const names=[...new Set([...(db.orders||[]).map(o=>o.customer),...(db.sales||[]).map(s=>s.buyer),...(db.payments||[]).map(p=>p.customer),...(db.debtEntries||[]).map(p=>p.customer)].map(n=>(n||'').trim()).filter(Boolean))].filter(n=>n.toLowerCase().includes(q));
+ const totalReceivable=names.reduce((sum,n)=>sum+customerLedger(n).balance,0);
+ const _cu=currentStaff(); const admin=!!_cu && (_cu.role==='admin'||_cu.id==='OWNER');
+ let html=`<div class="box" style="background:#fff8e1;border:1px solid #f0d36a"><b>💰 လက်ရှိဝယ်သူအကြွေးစုစုပေါင်း</b><div style="font-size:24px;margin-top:6px;color:#b42318">${M(totalReceivable)} Ks</div>${admin?'<button class="success" onclick="adminAddDebt()">➕ Admin အကြွေးအသစ်ထည့်ရန်</button>':''}</div>`;
+ html+=names.map(name=>{ const l=customerLedger(name); return `<div class="box"><h4>👤 ${esc(name)}</h4><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))"><div>စုစုပေါင်းရောင်း/အော်ဒါ<br><b>${M(l.total)} Ks</b></div><div>အရင်ပေးပြီး<br><b>${M(l.orderPaid+l.salePaid+l.debtPaid)} Ks</b></div><div>အကြွေးပေးချေပြီး<br><b>${M(l.paymentTotal)} Ks</b></div><div style="color:#b42318">လက်ရှိရရန်ရှိ<br><b>${M(l.balance)} Ks</b></div></div><div class="scroll"><table><thead><tr><th>ရက်စွဲ</th><th>အမျိုးအစား</th><th>အော်ဒါ/ဘောက်ချာ</th><th>စုစုပေါင်း</th><th>ပေးပြီး</th><th>ရရန်ရှိ</th>${admin?'<th>Admin</th>':''}</tr></thead><tbody>
+${l.orders.map(o=>`<tr><td>${esc(o.date)}</td><td>အော်ဒါ</td><td>${esc(o.id||'-')}</td><td>${M(o.total)}</td><td>${M(o.paid)}</td><td>${M(Math.max(0,(o.total||0)-(o.paid||0)))}</td>${admin?`<td><button type="button" class="smallbtn debt-edit-btn" data-debt-action="edit" data-debt-kind="order" data-debt-id="${esc(o.id||'')}">✏️ ပြင်</button><button type="button" class="smallbtn danger" data-debt-action="delete" data-debt-kind="order" data-debt-id="${esc(o.id||'')}">🗑️ ဖျက်</button></td>`:''}</tr>`).join('')}
+${l.sales.map(x=>`<tr><td>${esc(x.date)}</td><td>အရောင်း</td><td>${esc(x.voucherNo||x.id||'-')}</td><td>${M(x.total)}</td><td>${M(x.paid)}</td><td>${M(Math.max(0,(x.total||0)-(x.paid||0)))}</td>${admin?`<td><button type="button" class="smallbtn debt-edit-btn" data-debt-action="edit" data-debt-kind="sale" data-debt-id="${esc(x.id||'')}">✏️ ပြင်</button><button type="button" class="smallbtn danger" data-debt-action="delete" data-debt-kind="sale" data-debt-id="${esc(x.id||'')}">🗑️ ဖျက်</button></td>`:''}</tr>`).join('')}
+${l.debts.map(x=>`<tr style="background:#fff7df"><td>${esc(x.date)}</td><td>Admin အကြွေး</td><td>${esc(x.note||x.id||'-')}</td><td>${M(x.total)}</td><td>${M(x.paid)}</td><td>${M(Math.max(0,(x.total||0)-(x.paid||0)))}</td>${admin?`<td><button type="button" class="smallbtn debt-edit-btn" data-debt-action="edit" data-debt-kind="manual" data-debt-id="${esc(x.id||'')}">✏️ ပြင်</button><button type="button" class="smallbtn danger" data-debt-action="delete" data-debt-kind="manual" data-debt-id="${esc(x.id||'')}">🗑️ ဖျက်</button></td>`:''}</tr>`).join('')}
+${l.payments.map(x=>`<tr><td>${esc(x.date)}</td><td style="color:#18794e">အကြွေးပေးချေ</td><td>${esc(x.note||'-')}</td><td>-</td><td>${M(x.amount)}</td><td>-</td>${admin?`<td><button type="button" class="smallbtn" data-debt-action="edit-payment" data-debt-id="${esc(x.id||'')}">✏️ ပြင်</button><button type="button" class="smallbtn danger" data-debt-action="delete-payment" data-debt-id="${esc(x.id||'')}">🗑️ ဖျက်</button></td>`:''}</tr>`).join('')}
+</tbody></table></div></div>`; }).join('');
+ if(admin){ const dp=db.deletedPayments||[], dd=db.deletedDebtEntries||[], ds=db.deletedDebtSources||[]; html+=`<div class="box" style="background:#fff7f7"><h4>♻️ အော်ဒါ/အရောင်း အကြွေးမှတ်တမ်း — ပြန်ခေါ်ရန်</h4>${ds.map((x,i)=>`<div style="padding:7px;border-bottom:1px solid #ddd">${x.kind==='order'?'အော်ဒါ':x.kind==='sale'?'အရောင်း':'Admin အကြွေး'} — ${esc(x.data.customer||x.data.buyer||'-')} — ${M(x.data.total||0)} Ks <button type="button" class="smallbtn success" onclick="restoreDeletedDebtSource(${i})">♻️ ပြန်ခေါ်</button></div>`).join('')||'<span>ပြန်ခေါ်ရန် မရှိပါ။</span>'}</div>`; html+=`<div class="box" style="background:#f8f8f8"><h4>♻️ ဖျက်ထားသော အကြွေးမှတ်တမ်းများ — ပြန်ခေါ်ရန်</h4>${dd.map(x=>`<div style="padding:7px;border-bottom:1px solid #ddd">Admin အကြွေး — ${esc(x.customer)} — ${M(x.total)} Ks <button class="smallbtn success" onclick="restoreDeletedDebt(${JSON.stringify(x.id)})">♻️ ပြန်ခေါ်</button></div>`).join('')||''}${dp.map(x=>`<div style="padding:7px;border-bottom:1px solid #ddd">ပေးချေမှု — ${esc(x.customer)} — ${M(x.amount)} Ks <button class="smallbtn success" onclick="restoreDeletedPayment(${JSON.stringify(x.id)})">♻️ ပြန်ခေါ်</button></div>`).join('')||''}${(!dd.length&&!dp.length)?'<p>ဖျက်ထားသောမှတ်တမ်း မရှိပါ။</p>':''}</div>`; }
+ customerResults.innerHTML=html;
+}
+function renderCarNames(){
+  const ids=Array.isArray(db.carList)?db.carList:[];
+  const carSelect=document.getElementById('cid');
+  const deliveryCarSelect=document.getElementById('odeliveryCar');
+  const saleDeliveryCarSelect=document.getElementById('sdeliveryCar');
+  const editor=document.getElementById('carNameEditor');
+  if(carSelect){
+    carSelect.innerHTML=ids.map(id=>`<option value="${esc(id)}">${esc(db.carNames[id]||id)}</option>`).join('');
+  }
+  if(deliveryCarSelect){
+    const current=deliveryCarSelect.value;
+    deliveryCarSelect.innerHTML='<option value="">ကားရွေးပါ</option>'+ids.map(id=>`<option value="${esc(id)}">${esc(db.carNames[id]||id)}</option>`).join('');
+    if(ids.includes(current)) deliveryCarSelect.value=current;
+  }
+  if(saleDeliveryCarSelect){
+    const current=saleDeliveryCarSelect.value;
+    saleDeliveryCarSelect.innerHTML='<option value="">ကားရွေးပါ</option>'+ids.map(id=>`<option value="${esc(id)}">${esc(db.carNames[id]||id)}</option>`).join('');
+    if(ids.includes(current)) saleDeliveryCarSelect.value=current;
+  }
+  if(editor){
+    editor.innerHTML=ids.map((id,n)=>`<div class="car-name-row" style="display:flex;gap:6px;align-items:end;margin:6px 0;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px"><label>ကား ${n+1} (${esc(id)})</label><input type="text" class="car-name-input" id="carname-${esc(id)}" data-car-id="${esc(id)}" value="${esc(db.carNames[id]||id)}" autocomplete="off" spellcheck="false"></div>
+      <button type="button" class="smallbtn success" onclick="saveOneCarName('${esc(id)}')">💾 သိမ်း</button>
+    </div>`).join('');
+  }
+}
+function saveOneCarName(id){
+  const el=document.getElementById('carname-'+id);
+  const v=(el?.value||'').trim();
+  if(!v)return alert('ကားအမည်ထည့်ပါ။');
+  db.carNames[id]=v;
+  localStorage.setItem(K,JSON.stringify(db));
+  render();
+  alert('ကားအမည် သိမ်းပြီးပါပြီ — '+v);
+}
+
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function saveCarNames(){if(!requireRole('manager'))return;
+  document.querySelectorAll('.car-name-input').forEach(el=>{
+    const id=el.dataset.carId, v=(el.value||'').trim();
+    if(id && v) db.carNames[id]=v;
+  });
+  localStorage.setItem(K,JSON.stringify(db));
+  render();
+  alert('ကားအမည်များ သိမ်းပြီးပါပြီ။');
+}
+function addNewCar(){if(!requireRole('manager'))return;
+  const name=(document.getElementById('newCarName')?.value||'').trim();
+  if(!name)return alert('ကားအမည်ထည့်ပါ');
+  let n=1,id='CAR-'+String(n).padStart(2,'0');
+  while(db.carList.includes(id)){n++;id='CAR-'+String(n).padStart(2,'0');}
+  db.carList.push(id); db.carNames[id]=name;
+  document.getElementById('newCarName').value='';
+  save();
+  renderCarNames();
+  alert('ကားအသစ် ထည့်ပြီးပါပြီ — '+name);
+}
+function addCar(){if(!cid.value)return alert('ကားရွေးပါ');db.cars.push({date:cdate.value||today(),id:cid.value,inc:+cin.value||0,ex:+cex.value||0,sal:+csal.value||0});save();}
+function stockQty(p){const sold=db.sales.reduce((a,s)=>a+(Array.isArray(s.items)?s.items.filter(x=>x.pid===p.id).reduce((z,x)=>z+(+x.qty||0),0):(s.pid===p.id?(+s.qty||0):0)),0);const ordered=db.orders.filter(o=>!['Cancelled','Returned','Delivered'].includes(o.status)).reduce((a,o)=>a+(Array.isArray(o.items)?o.items.filter(x=>x.pid===p.id).reduce((z,x)=>z+(+x.qty||0),0):(o.pid===p.id?(+o.qty||0):0)),0);return p.open-sold-ordered;}
+function editCarOrderNote(orderIndex){
+  const o=db.orders[orderIndex];
+  if(!o)return;
+  const note=prompt('ဒီ Order ရဲ့ Note ကို ပြင်ရန်',o.note||'');
+  if(note===null)return;
+  o.note=note.trim();
+  localStorage.setItem(K,JSON.stringify(db));
+  render();
+}
+function editCarSaleNote(saleIndex){
+  const s=db.sales[saleIndex];
+  if(!s)return;
+  const note=prompt('ဒီရောင်းစာရင်းရဲ့ Note ကို ပြင်ရန်',s.note||'');
+  if(note===null)return;
+  s.note=note.trim();
+  localStorage.setItem(K,JSON.stringify(db));
+  render();
+}
+
+function fillProductNameList(){
+  const dl=document.getElementById("productNameList");
+  if(dl) dl.innerHTML=[...new Set(db.products.map(p=>p.name).filter(Boolean))].map(n=>`<option value="${esc(n)}"></option>`).join("");
+}
+
+const DEFAULT_PRODUCT_CATEGORIES=['အစားအသောက်','အဝတ်အစား','အိမ်သုံးပစ္စည်း','အီလက်ထရောနစ်','အလှကုန်','ဆောက်လုပ်ရေးပစ္စည်း','Cement','အုတ်/သဲ/ကျောက်','ဝါး/မျော','အုန်းဆံကြိုး','အထပ်သား','အိမ်ဆောက်သံ','ရုံးသုံးပစ္စည်း','အခြား'];
+function getProductCategories(){db.productCategories=Array.isArray(db.productCategories)&&db.productCategories.length?db.productCategories:DEFAULT_PRODUCT_CATEGORIES.slice();return db.productCategories;}
+function renderProductTypeFilter(){
+  const el=document.getElementById('productTypeFilter'); if(!el)return;
+  const current=el.value;
+  const cats=getProductCategories();
+  el.innerHTML='<option value="">အမျိုးအစားအားလုံး</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  if(cats.includes(current))el.value=current;
+}
+function filterProductTable(){
+  const name=(document.getElementById('productNameFilter')?.value||'').trim().toLowerCase();
+  const type=document.getElementById('productTypeFilter')?.value||'';
+  const rows=document.querySelectorAll('#products tr[data-product-row]');
+  rows.forEach(row=>{
+    const pn=(row.dataset.name||'').toLowerCase();
+    const pt=row.dataset.type||'';
+    row.style.display=(!name||pn.includes(name))&&(!type||pt===type)?'':'none';
+  });
+}
+function renderProductsTable(){
+  const productsEl=document.getElementById('products'); if(!productsEl)return;
+  productsEl.innerHTML=db.products.map((p,i)=>`<tr id="product-row-${i}" data-product-row="1" data-name="${esc(p.name)}" data-type="${esc(p.type||'')}">
+    <td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${esc(p.type||'')}</td><td class="admin-buy-only">${M(p.buy)}</td><td>${M(p.sell)}</td><td>${p.open}</td>
+    <td><button class="smallbtn" onclick="editProduct(${i})">✏️ ပြင်ဆင်ရန်</button></td></tr>`).join('')||'<tr><td colspan="7">ကုန်ပစ္စည်း မရှိသေးပါ။</td></tr>';
+  renderProductTypeFilter();
+  filterProductTable();
+}
+
+function fillCustomerNameList(){const dl=document.getElementById('customerNameList');if(!dl)return;const names=[...new Set([...(db.orders||[]).map(x=>x.customer),...(db.sales||[]).map(x=>x.buyer),...(db.payments||[]).map(x=>x.customer)].map(x=>(x||'').trim()).filter(Boolean))];dl.innerHTML=names.map(n=>`<option value="${esc(n)}"></option>`).join('');}
+function render(){
+  applyAdminBuyVisibility();
+  getProductCategories();
+  fillCustomerNameList();
+  fillProducts();
+  fillProductNameList();
+
+  const productsEl=document.getElementById('products');
+  const stockEl=document.getElementById('stock');
+  const salesEl=document.getElementById('sales');
+  const carsEl=document.getElementById('cars');
+
+
+
+  renderProductsTable();
+
+  if(stockEl){
+    stockEl.innerHTML=db.products.map(p=>`<tr>
+      <td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${esc(p.type||'-')}</td><td class="admin-buy-only">${M(p.buy)}</td><td>${M(p.sell)}</td><td>${stockQty(p)}</td>
+    </tr>`).join('') || '<tr><td colspan="6">ကုန်ပစ္စည်း မရှိသေးပါ။</td></tr>';
+  }
+
+  if(salesEl){
+    salesEl.innerHTML=db.sales.slice().reverse().map((s,ri)=>{
+      const items=Array.isArray(s.items)?s.items:[{pid:s.pid,qty:s.qty}];
+      const names=items.map(x=>(db.products.find(p=>p.id===x.pid)?.name||s.name||x.pid)+' × '+x.qty).join('<br>');
+      const q=items.reduce((a,x)=>a+(+x.qty||0),0);
+      const idx=db.sales.length-1-ri;
+      return `<tr><td>${esc(s.date)}</td><td>${esc(s.buyer||'')}<br><small>${esc(s.id||'')}</small><br><small>Voucher: ${esc(s.voucherNo||'-')}</small></td><td>${names}</td><td>${q}</td><td>${esc(db.carNames[s.deliveryCar]||s.deliveryCar||'')}</td><td>${M(s.total)}</td><td>${M(s.paid)}</td><td>${M((s.total||0)-(s.paid||0))}</td><td><button class="smallbtn success" onclick="printVoucher('sale',${idx})">🖨️ ပုံနှိပ်ရန်</button><button class="smallbtn danger" onclick="deleteSale(${idx})">ဖျက်</button></td></tr>`;
+    }).join('') || '<tr><td colspan="9">ရောင်းစာရင်း မရှိသေးပါ။</td></tr>';
+  }
+
+  const t=today();
+  const todayOrders=db.orders.filter(o=>o.date===t);
+  const pending=db.orders.filter(o=>['New','Confirmed','Preparing','Packed'].includes(o.status));
+  const transit=db.orders.filter(o=>['Shipped','လမ်းတွင်','Out for Delivery'].includes(o.status));
+  const overdue=db.orders.filter(isအချိန်ကျော်);
+  const delivered=db.orders.filter(o=>o.status==='Delivered');
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('dOrders',todayOrders.length); set('dPending',pending.length); set('dTransit',transit.length); set('dအချိန်ကျော်',overdue.length); set('dDelivered',delivered.length);
+  const allNames=[...new Set([...(db.orders||[]).map(o=>o.customer),...(db.sales||[]).map(x=>x.buyer)].map(x=>(x||'').trim()).filter(Boolean))]; const totalReceivable=allNames.reduce((a,n)=>a+customerLedger(n).balance,0); const recEl=document.getElementById('dReceivable'); if(recEl)recEl.textContent=M(totalReceivable)+' Ks';
+
+  const daySales=db.sales.filter(s=>s.date===t).reduce((a,s)=>a+(+s.total||0),0);
+  const orderSales=db.orders.filter(o=>o.date===t).reduce((a,o)=>a+(+o.total||0),0);
+  set('salesT',M(daySales+orderSales));
+  set('recvT',M(db.orders.reduce((a,o)=>a+(+o.balance||0),0)+db.sales.reduce((a,s)=>a+((+s.total||0)-(+s.paid||0)),0)));
+  set('carT',M(db.cars.reduce((a,c)=>a+(+c.inc||0)-(+c.ex||0)-(+c.sal||0),0)));
+
+  const urgentEl=document.getElementById('urgentOrders');
+  if(urgentEl){
+    const recentOrders=db.orders.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||String(b.id||'').localeCompare(String(a.id||''))).slice(0,20); urgentEl.innerHTML=recentOrders.map(o=>`<tr class="${o.status==='Delivered'?'delivered-row':(isအချိန်ကျော်(o)?'overdue':'')}"><td><b>${esc(o.id)}</b></td><td>${esc(o.customer||'အမည်မသိဝယ်သူ')}</td><td><b>🚚 ${esc(db.carNames[o.deliveryCar]||o.deliveryCar||'ကားမရွေးထားပါ')}</b></td><td>${Array.isArray(o.items)?o.items.map(x=>(db.products.find(p=>p.id===x.pid)?.name||x.pid)+' × '+x.qty).join(', '):esc(o.product)+' × '+o.qty}</td><td>${esc(o.date||'-')}</td><td>${esc(o.status||'-')}</td></tr>`).join('')||'<tr><td colspan="6">အော်ဒါ မရှိသေးပါ။</td></tr>';
+  }
+
+  renderOrders();
+  renderCustomers();
+  renderCarNames();
+  const health=document.getElementById('dataHealth'); if(health) health.textContent=`✅ Data OK — Products ${db.products.length} | Orders ${db.orders.length} | Sales ${db.sales.length} | Cars ${db.carList.length}`;
+
+  if(carsEl){
+    carsEl.innerHTML=db.carList.map(id=>{
+      const a=db.cars.filter(c=>c.id===id);
+      const carOrders=db.orders.filter(o=>o.deliveryCar===id);
+      const carSales=db.sales.filter(s=>s.deliveryCar===id);
+      const orderCount=carOrders.length;
+      const saleCount=carSales.length;
+      const totalTrips=orderCount+saleCount;
+      const i=a.reduce((x,c)=>x+(+c.inc||0),0), e=a.reduce((x,c)=>x+(+c.ex||0),0), sal=a.reduce((x,c)=>x+(+c.sal||0),0);
+      const orderDetails=carOrders.length?carOrders.map(o=>`<div style="border:1px solid #d9e2ec;border-radius:8px;padding:8px;margin:4px 0;background:#f8fafc;white-space:normal;min-width:420px">
+        <b>📦 Order — ${esc(o.id||'Order')}</b> — ${esc(o.date||'')}<br>
+        <span>📍 <b>Location:</b> ${esc(o.address||'-')}</span><br>
+        <span>👤 <b>Customer:</b> ${esc(o.customer||'-')}</span><br>
+        <span>📝 <b>Note:</b> ${esc(o.note||'-')}</span>
+        <button type="button" class="smallbtn success" onclick="editCarOrderNote(${db.orders.indexOf(o)})">✏️ မှတ်ချက်ပြင်ရန်</button>
+      </div>`).join(''):'';
+      const saleDetails=carSales.length?carSales.map(s=>`<div style="border:1px solid #cfe5d7;border-radius:8px;padding:8px;margin:4px 0;background:#f4fbf6;white-space:normal;min-width:420px">
+        <b>🛒 ရောင်းစာရင်း</b> — ${esc(s.date||'')}<br>
+        <span>📍 <b>Location:</b> ${esc(s.address||'-')}</span><br>
+        <span>👤 <b>Customer:</b> ${esc(s.buyer||'-')}</span><br>
+        <span>📝 <b>Note:</b> ${esc(s.note||'-')}</span>
+        <button type="button" class="smallbtn success" onclick="editCarSaleNote(${db.sales.indexOf(s)})">✏️ မှတ်ချက်ပြင်ရန်</button>
+      </div>`).join(''):'';
+      const details=(orderDetails||saleDetails)?orderDetails+saleDetails:'<span style="color:#777">ဒီကားအတွက် Order / ရောင်းစာရင်း မရှိသေးပါ။</span>';
+      return `<tr><td>${esc(db.carNames[id]||id)}</td><td><b>${totalTrips}</b> ခေါက်<br><small>Order ${orderCount} | ရောင်း ${saleCount}</small></td><td>${M(i)}</td><td>${M(e)}</td><td>${M(sal)}</td><td>${M(i-e-sal)}</td><td style="white-space:normal">${details}</td></tr>`;
+    }).join('') || '<tr><td colspan="7">ကားစာရင်း မရှိသေးပါ။</td></tr>';
+  }
+}
+
+  applyEasyMode();
+  applyAdminBuyVisibility();
+function editProduct(i){
+ const p=db.products[i]; if(!p)return;
+ const row=document.getElementById('product-row-'+i); if(!row)return;
+ row.innerHTML=`<td><input id="epid-${i}" value="${esc(p.id)}" style="width:90px"></td>
+ <td><input id="epname-${i}" list="productNameList" value="${esc(p.name)}" style="width:150px"></td>
+ <td><select id="eptype-${i}"><option value="">အမျိုးအစား</option><option>အစားအသောက်</option><option>အဝတ်အစား</option><option>အိမ်သုံးပစ္စည်း</option><option>အီလက်ထရောနစ်</option><option>အလှကုန်</option><option>ဆောက်လုပ်ရေးပစ္စည်း</option><option>ဘိလပ်မြေ</option><option>အုတ်/သဲ/ကျောက်</option><option>ဝါး/မျော</option><option>အုန်းဆံကြိုး</option><option>အထပ်သား</option><option>အိမ်ဆောက်သံ</option><option>ရုံးသုံးပစ္စည်း</option><option>အခြား</option></select></td>
+ <td class="admin-buy-only"><input id="epbuy-${i}" type="number" value="${p.buy||0}" style="width:100px"></td>
+ <td><input id="epsell-${i}" type="number" value="${p.sell||0}" style="width:100px"></td>
+ <td><input id="epopen-${i}" type="number" value="${p.open||0}" style="width:90px"></td>
+ <td><button class="smallbtn success" onclick="saveProductEdit(${i})">💾 သိမ်း</button><button class="smallbtn" onclick="render()">✖ မလုပ်</button></td>`;
+ document.getElementById('eptype-'+i).value=p.type||'';
+}
+function saveProductEdit(i){if(!requireRole('manager'))return;
+ const p=db.products[i]; if(!p)return;
+ const id=document.getElementById('epid-'+i)?.value.trim();
+ const name=document.getElementById('epname-'+i)?.value.trim();
+ const type=document.getElementById('eptype-'+i)?.value.trim()||'';
+ const buy=Number(document.getElementById('epbuy-'+i)?.value)||0;
+ const sell=Number(document.getElementById('epsell-'+i)?.value)||0;
+ const open=Number(document.getElementById('epopen-'+i)?.value)||0;
+ if(!id||!name)return alert('Product ID နှင့် ပစ္စည်းအမည် ထည့်ပါ။');
+ if(db.products.some((x,j)=>j!==i && String(x.id).toLowerCase()===id.toLowerCase()))return alert('ဒီ Product ID ရှိပြီးသားပါ။');
+ const oldId=p.id; p.id=id; p.name=name; p.type=type; p.buy=buy; p.sell=sell; p.open=open;
+ // Update references in existing sales/orders when Product ID changes
+ if(oldId!==id){
+   db.sales.forEach(x=>{if(x.pid===oldId)x.pid=id;if(Array.isArray(x.items))x.items.forEach(it=>{if(it.pid===oldId)it.pid=id;});});
+   db.orders.forEach(x=>{if(x.pid===oldId)x.pid=id;if(Array.isArray(x.items))x.items.forEach(it=>{if(it.pid===oldId)it.pid=id;});});
+ }
+ save();
+ alert('ကုန်ပစ္စည်းကို ပြင်ပြီး သိမ်းပြီးပါပြီ။');
+}
+
+function report(){
+ let typ=period.value,d=rdate.value||today(),y=String(ryear.value);
+ let ss=db.sales.filter(s=>typ==='day'?s.date===d:typ==='month'?s.date.slice(0,7)===d.slice(0,7):s.date.slice(0,4)===y);
+ let oo=db.orders.filter(o=>typ==='day'?o.date===d:typ==='month'?o.date.slice(0,7)===d.slice(0,7):o.date.slice(0,4)===y);
+ let cc=db.cars.filter(c=>typ==='day'?c.date===d:typ==='month'?c.date.slice(0,7)===d.slice(0,7):c.date.slice(0,4)===y);
+ reportout.innerHTML=`<h3>ရောင်းအား: ${M(ss.reduce((a,s)=>a+s.total,0)+oo.reduce((a,o)=>a+o.total,0))}</h3>
+ <p>Orders: ${oo.length}</p><p>Delivered: ${oo.filter(o=>o.status==='Delivered').length}</p>
+ <p>ရရန်ရှိ: ${M(oo.reduce((a,o)=>a+o.balance,0)+ss.reduce((a,s)=>a+s.total-s.paid,0))}</p>
+ <p>ကား Net: ${M(cc.reduce((a,c)=>a+c.inc-c.ex-c.sal,0))}</p>`;
+}
+function backup(){if(!requireRole('manager'))return;let b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='complete-business-order-tracking-backup.json';a.click();}
+function restore(e){let r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);db.products ||= [];db.sales ||= [];db.cars ||= [];db.orders ||= [];save();}catch(err){alert('Backup file မမှန်ပါ။')}};r.readAsText(e.target.files[0]);}
+function wipe(){if(!requireRole('admin'))return;if(confirm('စာရင်းအားလုံးဖျက်မလား?')){db={products:[],sales:[],cars:[],orders:[]};save();}}
+odate.value=sdate.value=cdate.value=rdate.value=today(); const cpd=document.getElementById('creditPaymentDate'); if(cpd)cpd.value=today(); expected.value=today(); oid.value=nextOrderId(); ryear.value=new Date().getFullYear();
+(function(){const u=currentStaff();if(u){document.getElementById('loginGate').style.display='none';}else{document.getElementById('loginGate').style.display='flex';}renderStaff();autoBackupSnapshot();})();
+// ===== v16 DATA-SAFE OVERRIDES =====
+function validateItems(items, kind){
+  if(!Array.isArray(items)||!items.length) return 'အနည်းဆုံး ပစ္စည်း ၁ မျိုးထည့်ပါ။';
+  const pids=new Set(db.products.map(p=>p.id));
+  for(const x of items){
+    if(!pids.has(x.pid)) return 'မရှိတော့သော ကုန်ပစ္စည်းတစ်ခု ရွေးထားပါသည်။';
+    const q=safeNumber(x.qty), price=safeNumber(x.price);
+    if(q<=0) return 'Qty သည် 0 ထက်ကြီးရပါမည်။';
+    if(price<0) return 'ဈေးနှုန်းသည် အနုတ်မဖြစ်ရပါ။';
+    if(kind==='order' && safeNumber(x.discount)>q*price) return 'Discount သည် ပစ္စည်းတန်ဖိုးထက် မကျော်ရပါ။';
+  }
+  return '';
+}
+function nextUniqueOrderId(){let id=nextOrderId(),n=1;while(db.orders.some(o=>o.id===id)){id=nextOrderId()+'-'+n++;}return id;}
+function addOrder(){
+  const buyer=cleanText(document.getElementById('obuyer')?.value)||'အမည်မသိဝယ်သူ';
+  const err=validateItems(orderItems,'order'); if(err)return alert(err);
+  const car=cleanText(document.getElementById('odeliveryCar')?.value); if(car&&!db.carList.includes(car))return alert('ရွေးထားသောကား မရှိတော့ပါ။');
+  const fee=Math.max(0,safeNumber(document.getElementById('odeliveryFee')?.value));
+  const labor=Math.max(0,safeNumber(document.getElementById('olaborFee')?.value));
+  let itemsTotal=orderItems.reduce((a,x)=>a+Math.max(0,safeNumber(x.qty)*safeNumber(x.price)-safeNumber(x.discount)),0);
+  const total=itemsTotal+fee+labor; let paid=safeNumber(document.getElementById('opaid')?.value); const type=document.getElementById('opay')?.value||'cash';
+  if(type==='cash')paid=total; if(type==='credit')paid=0; if(paid<0||paid>total)return alert('ပေးချေငွေသည် စုစုပေါင်းထက် မကျော်ရပါ။');
+  const id=nextUniqueOrderId(); const voucherNo=cleanText(document.getElementById('ovoucher')?.value); const items=orderItems.map(x=>({pid:x.pid,productName:db.products.find(p=>p.id===x.pid)?.name||'',qty:safeNumber(x.qty),variant:cleanText(x.variant),price:safeNumber(x.price),discount:safeNumber(x.discount)}));
+  db.orders.push({id,voucherNo,date:cleanText(document.getElementById('odate')?.value)||today(),customer:buyer,phone:cleanText(document.getElementById('ophone')?.value),address:cleanText(document.getElementById('oaddress')?.value),items,pid:items[0].pid,product:items[0].productName,qty:items.reduce((a,x)=>a+x.qty,0),variant:items[0].variant||'',total,deliveryFee:fee,laborFee:labor,paid,balance:total-paid,expected:cleanText(document.getElementById('expected')?.value)||today(),deliveryCar:car,courier:cleanText(document.getElementById('ocourier')?.value),tracking:cleanText(document.getElementById('otracking')?.value),status:type==='cash'?'Confirmed':'New',note:cleanText(document.getElementById('onote')?.value),packed:false,shippedDate:'',deliveredDate:'',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
+  save(); alert('Order သိမ်းပြီးပါပြီ — '+id); clearOrder();
+}
+function addSale(){
+  const buyerName=cleanText(document.getElementById('buyer')?.value); if(!buyerName)return alert('ဝယ်သူ / Customer အမည်ထည့်ပါ။');
+  const err=validateItems(saleItems,'sale'); if(err)return alert(err);
+  const car=cleanText(document.getElementById('sdeliveryCar')?.value); if(car&&!db.carList.includes(car))return alert('ရွေးထားသောကား မရှိတော့ပါ။');
+  const fee=Math.max(0,safeNumber(document.getElementById('sdeliveryFee')?.value)); const labor=Math.max(0,safeNumber(document.getElementById('slaborFee')?.value));
+  const total=saleItems.reduce((a,x)=>a+safeNumber(x.qty)*safeNumber(x.price),0)+fee+labor; let pa=safeNumber(document.getElementById('paid')?.value); const type=document.getElementById('pay')?.value||'cash';
+  if(type==='cash')pa=total; if(type==='credit')pa=0; if(pa<0||pa>total)return alert('ပေးချေငွေသည် စုစုပေါင်းထက် မကျော်ရပါ။');
+  const id=makeId('SAL'); const voucherNo=cleanText(document.getElementById('svoucher')?.value); const items=saleItems.map(x=>({pid:x.pid,productName:db.products.find(p=>p.id===x.pid)?.name||'',qty:safeNumber(x.qty),price:safeNumber(x.price)}));
+  db.sales.push({id,voucherNo,date:cleanText(document.getElementById('sdate')?.value)||today(),buyer:buyerName,deliveryCar:car,address:cleanText(document.getElementById('saddress')?.value),note:cleanText(document.getElementById('snote')?.value),paymentType:type,items,deliveryFee:fee,laborFee:labor,total,paid:pa,credit:total-pa,pid:items[0].pid,name:items[0].productName,qty:items.reduce((a,x)=>a+x.qty,0),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});
+  save(); clearSaleForm(); alert('ရောင်းစာရင်း သိမ်းပြီးပါပြီ — '+id);
+}
+function repairData(){if(!requireRole('admin'))return;
+  const before=JSON.stringify(db); db=normalizeDB(db); const after=JSON.stringify(db); localStorage.setItem(K+'_lastgood',before); localStorage.setItem(K,after); render();
+  const health=document.getElementById('dataHealth'); if(health)health.textContent='✅ Data စစ်ဆေးပြီးပါပြီ။ Structure မှန်ကန်နေပါသည်။'; alert(before===after?'Data အမှားမတွေ့ပါ။':'Data ကို စစ်ဆေးပြီး လိုအပ်သော field များကို ပြင်ဆင်ပြီးပါပြီ။');
+}
+function backup(){const b=new Blob([JSON.stringify(normalizeDB(db),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Toe_Pwar_Gyi_backup_'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function restore(e){const file=e?.target?.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const imported=normalizeDB(JSON.parse(r.result));if(!confirm('Backup data ကို လက်ရှိ data အပေါ် အစားထိုးမလား?'))return;localStorage.setItem(K+'_lastgood',JSON.stringify(db));db=imported;save();alert('Backup data ပြန်ထည့်ပြီးပါပြီ။');}catch(err){alert('Backup file မမှန်ပါ သို့မဟုတ် ဖတ်မရပါ။');}finally{e.target.value='';}};r.readAsText(file);}
+function wipe(){if(confirm('စာရင်းအားလုံးဖျက်မလား? ဒီလုပ်ဆောင်ချက်မလုပ်မီ Backup JSON လုပ်ထားပါ။')){localStorage.setItem(K+'_lastgood',JSON.stringify(db));db=normalizeDB(EMPTY_DB);save();}}
+
+function printVoucher(kind,index){
+  const data=kind==='order'?db.orders[index]:db.sales[index]; if(!data)return;
+  const items=Array.isArray(data.items)?data.items:[];
+  const names=items.map(x=>{const p=db.products.find(p=>p.id===x.pid);return {name:p?.name||x.productName||x.pid||'-',qty:safeNumber(x.qty),price:safeNumber(x.price),total:Math.max(0,safeNumber(x.qty)*safeNumber(x.price)-safeNumber(x.discount))};});
+  const total=safeNumber(data.total), paid=safeNumber(data.paid), balance=Math.max(0,total-paid);
+  const customer=kind==='order'?data.customer:data.buyer;
+  const html=`<div class="voucher-print"><h2 style="font-size:15px;line-height:1.35;margin-bottom:3px">အစဥ်ကောင်းသည်ထက်ကောင်းအောင်ဆောင်ရွက်နေမည့်</h2><div style="font-weight:bold;text-align:center;width:100%">စေတနာ ဦးစိုးမောင် မိသားစု</div><div style="font-size:14px;font-weight:bold;margin-top:2px"><span class="san-badge">စံ</span> တိုးပွားကြီး (ပန်သစ္စာ)</div><div style="font-size:10px;line-height:1.35;margin-top:3px">ဝါး၊ ဓနိ၊ ထရံ၊ အုတ်၊ သဲ၊ ကျောက်၊ ဘိလပ်မြေ အိမ်ဆောက်ပစ္စည်းအရောင်းဆိုင်</div><div style="font-size:9px;line-height:1.3">အမှတ်(၁၂၃၉)၊ တိုးချဲ့(၂)လမ်း၊ ၂-မြောက်ရပ်ကွက်၊ သာကေတ၊ ရန်ကုန်မြို့</div><div style="font-size:9px">09 421022335, 09 421022334, 01 9551049</div><div class="line"></div><div class="center">${kind==='order'?'အော်ဒါဘောက်ချာ':'အရောင်းဘောက်ချာ'}</div><div class="line"></div><div>ဘောက်ချာအမှတ်: <b>${esc(data.voucherNo||'-')}</b></div><div>အမှတ်: ${esc(data.id||'-')}</div><div>ရက်စွဲ: ${esc(data.date||'-')}</div><div>ဝယ်သူ: ${esc(customer||'-')}</div><div>Delivery Car: ${esc(db.carNames[data.deliveryCar]||data.deliveryCar||'-')}</div><div class="line"></div><table><thead><tr><th>ပစ္စည်း</th><th>အရေအတွက်</th><th class="right">ငွေပမာဏ</th></tr></thead><tbody>${names.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.qty}</td><td class="right">${M(x.total)}</td></tr>`).join('')}</tbody></table><div class="line"></div><div class="right"><b>စုစုပေါင်း: ${M(total)} Ks</b><br>ပေးချေပြီး: ${M(paid)} Ks<br>ရရန်ရှိ: ${M(balance)} Ks</div>${data.deliveryFee?`<div>Delivery: ${M(data.deliveryFee)} Ks</div>`:''}${data.laborFee?`<div>Labor: ${M(data.laborFee)} Ks</div>`:''}<div class="line"></div><div>မှတ်ချက်: ${esc(data.note||'-')}</div><div class="center" style="margin-top:8px">Thank you</div></div>`;
+  const area=document.getElementById('printArea'); area.innerHTML=html; window.print(); setTimeout(()=>area.innerHTML='',500);
+}
+if(!orderItems.length && db.products.length) addOrderItem();
+render();renderSaleItems();renderOrderItems();renderCarNames();
+setTimeout(()=>{ensureStaffActive();initOrderSync();},700); initDeliveryNotifications();
+
+// ===== LOCAL BUSINESS DATA ONLY =====
+let cloudSaveTimer=null, cloudDataRef=null, cloudDataListenerAttached=false, cloudHydrating=false;
+function getConfiguredRTDBUrl(){return String(localStorage.getItem('tpg_rtdb_url')||window.SHARED_FIREBASE_DATABASE_URL||'').trim();}
+function ensureSharedCloud(){
+  const url=getConfiguredRTDBUrl();
+  if(!url || !window.firebase) return false;
+  if(!ensureFirebaseConnection(url)) return false;
+  cloudDataRef=liveRTDB.ref('appData');
+  if(!cloudDataListenerAttached){
+    cloudDataListenerAttached=true;
+    cloudDataRef.on('value',snap=>{
+      if(cloudHydrating)return;
+      const remote=snap.val();
+      if(!remote || typeof remote!=='object')return;
+      const remoteTs=Number(remote.updatedAt||0), localTs=Number(localStorage.getItem(K+'_cloudUpdatedAt')||0);
+      if(remoteTs>localTs && remote.data){
+        try{cloudHydrating=true;db=normalizeDB(remote.data);localStorage.setItem(K,JSON.stringify(db));localStorage.setItem(K+'_cloudUpdatedAt',String(remoteTs));render();renderStaff();}catch(e){}finally{cloudHydrating=false;}
+      }
+    });
+  }
+  return true;
+}
+function scheduleCloudSave(){
+  if(cloudHydrating)return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(()=>{
+    if(!ensureSharedCloud() || !cloudDataRef)return;
+    const updatedAt=Date.now();
+    cloudDataRef.set({updatedAt,data:db}).then(()=>localStorage.setItem(K+'_cloudUpdatedAt',String(updatedAt))).catch(()=>{});
+  },250);
+}
+async function hydrateFromCloud(){
+  if(!ensureSharedCloud() || !cloudDataRef)return false;
+  try{
+    const snap=await cloudDataRef.once('value'); const remote=snap.val();
+    if(remote && remote.data){
+      const remoteTs=Number(remote.updatedAt||0), localTs=Number(localStorage.getItem(K+'_cloudUpdatedAt')||0);
+      if(remoteTs>=localTs){cloudHydrating=true;db=normalizeDB(remote.data);localStorage.setItem(K,JSON.stringify(db));localStorage.setItem(K+'_cloudUpdatedAt',String(remoteTs));cloudHydrating=false;render();renderStaff();}
+    } else {scheduleCloudSave();}
+    return true;
+  }catch(e){return false;}
+}
+
+
+// ===== ORDER DELIVERY STATUS SYNC (FIREBASE REALTIME DATABASE) =====
+let orderSyncRef=null, orderSyncConnected=false;
+function setOrderSyncStatus(msg, cls=''){const e=document.getElementById('orderSyncStatus');if(e){e.innerHTML=msg;e.className='live-status '+cls;}}
+
+let deliveryNotifyEnabled=false;
+let lastDeliveryNoticeAt=Number(localStorage.getItem('tpg_last_delivery_notice_at')||0);
+function updateDeliveryNotifyStatus(){
+  const e=document.getElementById('deliveryNotifyStatus');
+  if(!e)return;
+  if(!('Notification' in window)){e.textContent='ဒီ Browser မှာ Notification မထောက်ပံ့ပါ';return;}
+  e.textContent=Notification.permission==='granted'?'🔔 Notification ဖွင့်ထားပါပြီ':Notification.permission==='denied'?'🔕 Notification ပိတ်ထားသည်':'🔔 Notification ခွင့်ပြုရန် လိုအပ်ပါသည်';
+}
+async function enableDeliveryNotifications(){
+  if(!('Notification' in window)){alert('ဒီ Browser မှာ Notification မရနိုင်ပါ။ Chrome/Edge ကို အသုံးပြုပါ။');return;}
+  try{
+    const p=await Notification.requestPermission();
+    deliveryNotifyEnabled=p==='granted';
+    localStorage.setItem('tpg_delivery_notifications',deliveryNotifyEnabled?'1':'0');
+    updateDeliveryNotifyStatus();
+    if(deliveryNotifyEnabled) showDeliveryNotice('အသိပေးချက် စနစ်အလုပ်လုပ်နေပါပြီ','Order ပို့ပြီးကြောင်းကို ဆိုင်ဘက်မှာ အသိပေးပါမယ်။',false);
+  }catch(e){alert('Notification ခွင့်ပြုချက် မရပါ။ Browser Settings ကို စစ်ပါ။');}
+}
+function playDeliverySound(){
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const c=new C(); const now=c.currentTime;
+    [880,1175,1568].forEach((f,i)=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(0.001,now+i*0.16);
+      g.gain.exponentialRampToValueAtTime(0.18,now+i*0.16+0.03);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*0.16+0.14);
+      o.connect(g);g.connect(c.destination);o.start(now+i*0.16);o.stop(now+i*0.16+0.15);
+    });
+  }catch(e){}
+}
+function showDeliveryNotice(title,body,system=true){
+  const box=document.getElementById('deliveryNotifyBox');
+  if(box){
+    box.style.display='block';
+    box.innerHTML=`🔔 <b>${esc(title)}</b><br>${esc(body)}<br><small>${new Date().toLocaleString()}</small>`;
+    setTimeout(()=>{box.style.display='none';},12000);
+  }
+  playDeliverySound();
+  if(system && 'Notification' in window && Notification.permission==='granted'){
+    try{
+      const n=new Notification(title,{body,tag:'tpg-delivered',renotify:true});
+      n.onclick=()=>{window.focus();try{n.close()}catch(e){};show('orders');};
+    }catch(e){}
+  }
+}
+function notifyDeliveryIfNew(x){
+  const ts=Number(x?.updatedAt||0);
+  if(!ts || ts<=lastDeliveryNoticeAt || x.status!=='Delivered')return;
+  lastDeliveryNoticeAt=ts;
+  localStorage.setItem('tpg_last_delivery_notice_at',String(ts));
+  const oid=x.orderId||x.id||'-';
+  const by=x.by||'ပို့ဆောင်သူ';
+  showDeliveryNotice('🚚 Order ပို့ပြီးပါပြီ',`Order ${oid} ကို ${by} က ပစ္စည်းပို့ပြီးကြောင်း အတည်ပြုလိုက်ပါပြီ။`);
+}
+function initDeliveryNotifications(){
+  deliveryNotifyEnabled=localStorage.getItem('tpg_delivery_notifications')==='1' && ('Notification' in window) && Notification.permission==='granted';
+  updateDeliveryNotifyStatus();
+}
+function connectOrderSync(){
+  try{
+    const url=(document.getElementById('orderSyncUrl')?.value||localStorage.getItem('tpg_rtdb_url')||'').trim();
+    if(!url)return alert('Firebase Realtime Database URL ထည့်ပါ။');
+    if(!ensureFirebaseConnection(url))return;
+    localStorage.setItem('tpg_rtdb_url',url);
+    orderSyncRef=liveRTDB.ref('orderDeliveryStatus');
+    startOrderSyncListener();
+    setupStaffAccessSync();
+    startDriverOrderNotificationListener();
+  }catch(e){orderSyncConnected=false;setOrderSyncStatus('🔴 Firebase Error: '+esc(e.message),'offline');}
+}
+function startOrderSyncListener(){
+  if(!orderSyncRef)return;
+  orderSyncConnected=true;
+  setOrderSyncStatus('🟢 Order Sync ချိတ်ဆက်ပြီးပါပြီ','online');
+  orderSyncRef.off();
+  orderSyncRef.on('value',snap=>{
+    const data=snap.val()||{};
+    let changed=false;
+    Object.keys(data).forEach(id=>{
+      const x=data[id]||{}; notifyDeliveryIfNew(Object.assign({id},x)); const o=db.orders.find(z=>z.id===id);
+      if(!o)return;
+      const ts=Number(x.updatedAt||0), localTs=Number(o.deliverySyncAt||0);
+      if(ts>=localTs && x.status){
+        if(o.status!==x.status || o.deliveredDate!==(x.deliveredDate||'')){o.status=x.status;o.deliveredDate=x.deliveredDate||o.deliveredDate||'';o.deliverySyncAt=ts;o.deliveryBy=x.by||o.deliveryBy||'';o.deliveryUpdatedAt=ts;changed=true;}
+      }
+    });
+    if(changed){try{localStorage.setItem(K,JSON.stringify(db));}catch(e){} render();}
+  },err=>{orderSyncConnected=false;setOrderSyncStatus('🔴 Order Sync Error: '+esc(err.message),'offline');});
+}
+let driverOrderNotifyRef=null,driverOrderNotifyListenerAttached=false;
+let driverKnownOrderNotifications=new Set();
+function driverNotificationSummary(o){const items=(o.items||[]).map(x=>{const p=db.products.find(p=>p.id===x.pid);return (p?.name||x.productName||x.pid||'-')+' x '+(Number(x.qty)||0);}).slice(0,4).join(', ');return {orderId:o.id||'-',customer:o.customer||'အမည်မသိဝယ်သူ',address:o.address||'-',car:o.deliveryCar||'-',items:items||'-',createdAt:Date.now(),status:'New Order'};}
+function showDriverOrderNotification(n,system=true){const title='🔔 အော်ဒါအသစ် ရောက်ပါပြီ';const body=`Order ${n.orderId||'-'} | ${n.customer||'အမည်မသိဝယ်သူ'} | ကား ${n.car||'-'} | ${n.address||'-'}`;showDeliveryNotice(title,body,system);}
+function startDriverOrderNotificationListener(){
+ const u=currentStaff(); if(!u||u.role!=='driver'||!liveRTDB)return;
+ const ref=liveRTDB.ref('driverOrderNotifications/'+u.id); driverOrderNotifyRef=ref;
+ ref.once('value').then(snap=>{const d=snap.val()||{};driverKnownOrderNotifications=new Set(Object.keys(d));driverOrderNotifyListenerAttached=true;ref.on('child_added',child=>{const id=child.key;const n=child.val()||{};if(driverKnownOrderNotifications.has(id)){driverKnownOrderNotifications.delete(id);return;}driverKnownOrderNotifications.add(id);showDriverOrderNotification(n,true);renderOrders();});}).catch(()=>{});
+}
+function notifyAssignedDriver(o){
+ const car=cleanText(o.deliveryCar||'');if(!car||!liveRTDB)return;
+ const drivers=db.staff.filter(x=>x.active!==false&&x.role==='driver'&&x.driverCar===car);if(!drivers.length)return;
+ const payload=driverNotificationSummary(o);drivers.forEach(d=>liveRTDB.ref('driverOrderNotifications/'+d.id+'/'+o.id).set(payload).catch(()=>{}));
+}
+
+function pushOrderDeliveryStatus(o,status){
+  if(!orderSyncRef)return false;
+  const u=currentStaff();
+  const payload={orderId:o.id,status,updatedAt:Date.now(),by:u?.name||'ဝန်ထမ်း',role:u?.role||'',deliveredDate:status==='Delivered'?today():(o.deliveredDate||'')};
+  orderSyncRef.child(o.id).set(payload).catch(e=>setOrderSyncStatus('🔴 Sync Error: '+esc(e.message),'offline'));
+  return true;
+}
+function markOrderDelivered(i){
+  if(!requireRole('delivery'))return;
+  const o=db.orders[i]; if(!o)return;
+  if(!confirm('ဒီ Order ကို ပစ္စည်းပို့ပြီးကြောင်း သတ်မှတ်မလား?'))return;
+  o.status='Delivered'; o.deliveredDate=today(); o.deliveryBy=currentStaff()?.name||''; o.deliverySyncAt=Date.now(); o.deliveryUpdatedAt=o.deliverySyncAt;
+  save();
+  if(!orderSyncRef){
+    const url=localStorage.getItem('tpg_rtdb_url')||'';
+    if(url)connectOrderSync();
+  }
+  if(orderSyncRef)pushOrderDeliveryStatus(o,'Delivered');
+  alert('✅ ပစ္စည်းပို့ပြီးကြောင်း သိမ်းပြီးပါပြီ။ ဆိုင်ဘက်သို့ Sync လုပ်နေပါသည်။');
+}
+function initOrderSync(){
+  const url=localStorage.getItem('tpg_rtdb_url')||'';
+  const inp=document.getElementById('orderSyncUrl'); if(inp)inp.value=url; const mapInp=document.getElementById('rtdbUrl'); if(mapInp)mapInp.value=url;
+  if(url && window.firebase)connectOrderSync();
+}
+
+// ===== LIVE VEHICLES MAP + FIREBASE REALTIME DATABASE =====
+const LIVE_FIREBASE_CONFIG={apiKey:'AIzaSyC9eejTNPozg5Zb0skbrFyEBpvCVC1R3gI',authDomain:'toe-pwar-gyi-business-app.firebaseapp.com',projectId:'toe-pwar-gyi-business-app',storageBucket:'toe-pwar-gyi-business-app.firebasestorage.app',messagingSenderId:'1057078149836',appId:'1:1057078149836:web:40972f0843cec556803869',measurementId:'G-2DLK4FD7GP'};
+// Put the exact Firebase Realtime Database URL from Firebase Console here if you want zero-setup cloud access on every device.
+const DEFAULT_RTDB_URL='https://toe-pwar-gyi-business-app-default-rtdb.asia-southeast1.firebasedatabase.app';
+// One shared Firebase Realtime Database connection for Order Sync, Driver Notification, Staff Access and Live Vehicle Map.
+var liveRTDB=null,liveGeoWatch=null,liveMap=null,liveMarkers={},liveLocationsRef=null,liveConnected=false;
+function ensureFirebaseConnection(url){
+  const clean=String(url||TPG_DEFAULT_RTDB_URL||'').trim();
+  if(!clean){alert('Firebase Realtime Database URL ထည့်ပါ။');return false;}
+  if(!window.firebase){alert('Firebase library မတွေ့ပါ။');return false;}
+  try{
+    // Keep RTDB on a separate named Firebase app. This prevents RTDB's
+    // databaseURL configuration from changing the Auth/Firestore default app.
+    if(!liveFirebaseApp){
+      const appName='TPG_RTDB';
+      liveFirebaseApp = window.firebase.apps && window.firebase.apps.some(a=>a.name===appName)
+        ? window.firebase.app(appName)
+        : window.firebase.initializeApp(Object.assign({},TPG_FIREBASE_CONFIG,{databaseURL:clean}),appName);
+    }
+    const currentUrl=String(liveFirebaseApp.options?.databaseURL||'').replace(/\/$/,'');
+    const requested=clean.replace(/\/$/,'');
+    if(currentUrl && currentUrl!==requested){
+      alert('Firebase Realtime Database URL မကိုက်ညီပါ။\n\n'+currentUrl);
+      return false;
+    }
+    if(!liveRTDB) liveRTDB=window.firebase.database(liveFirebaseApp);
+    localStorage.setItem('tpg_rtdb_url',clean);
+    return true;
+  }catch(e){
+    console.error('Firebase RTDB connection error:',e);
+    alert('Firebase Realtime Database ချိတ်ရာတွင် ပြဿနာရှိပါသည်။\n'+(e.message||e));
+    return false;
+  }
+}
+function setLiveStatus(msg,cls=''){const e=document.getElementById('firebaseStatus');if(e)e.innerHTML=msg; if(cls)e.className='live-status '+cls;}
+function initLiveMap(){
+  if(!window.L||liveMap)return;
+  liveMap=L.map('liveMap').setView([16.8409,96.1735],12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(liveMap);
+}
+function renderLiveVehicleSelect(){
+ const sel=document.getElementById('liveVehicleSelect'); if(!sel)return;
+ const ids=Array.isArray(db.carList)?db.carList:[];
+ sel.innerHTML=ids.map(id=>`<option value="${esc(id)}">${esc(db.carNames[id]||id)}</option>`).join('');
+}
+function connectLiveFirebase(){
+ try{
+  const url=(document.getElementById('rtdbUrl')?.value||localStorage.getItem('tpg_rtdb_url')||'').trim();
+  if(!url)return alert('Firebase Realtime Database URL ထည့်ပါ။ Firebase Console > Realtime Database > Data မှ URL ကို copy လုပ်ပါ။');
+  if(!ensureFirebaseConnection(url))return;
+  localStorage.setItem('tpg_rtdb_url',url);
+  liveConnected=true; setLiveStatus('Firebase: 🟢 ချိတ်ဆက်ပြီးပါပြီ','online');
+  liveLocationsRef=liveRTDB.ref('vehicleLocations');
+  liveLocationsRef.off();
+  liveLocationsRef.on('value',snap=>renderLiveLocations(snap.val()||{}),err=>setLiveStatus('Firebase Error: '+esc(err.message),'offline'));
+  initLiveMap(); renderLiveVehicleSelect();
+  orderSyncRef=liveRTDB.ref('orderDeliveryStatus');
+  startOrderSyncListener();
+  setupStaffAccessSync();
+  startDriverOrderNotificationListener();
+ }catch(e){liveConnected=false;setLiveStatus('Firebase Error: '+esc(e.message),'offline');alert('Firebase ချိတ်ရာတွင် ပြဿနာရှိပါသည်။ URL နှင့် Realtime Database ကို စစ်ပါ။');}
+}
+function markerPopup(id,v){
+ const name=db.carNames[id]||id;
+ const t=v.updatedAt?new Date(v.updatedAt).toLocaleString():'-';
+ return `<b>🚗 ${esc(name)}</b><br>Driver: ${esc(v.driver||'-')}<br>Order: ${esc(v.orderId||'-')}<br>Destination: ${esc(v.destination||'-')}<br>Speed: ${safeNumber(v.speed).toFixed(1)} km/h<br>Last update: ${esc(t)}`;
+}
+function renderLiveLocations(data){
+ initLiveMap(); const ids=Object.keys(data||{});
+ const list=document.getElementById('liveVehicleList');
+ if(list) list.innerHTML=ids.length?ids.map(id=>{const v=data[id]||{},age=Date.now()-(Number(v.updatedAt)||0),on=age<120000;return `<div class="vehicle-card" onclick="focusVehicle('${esc(id)}')"><b>🚗 ${esc(db.carNames[id]||id)}</b> — ${on?'<span class="online">🟢 Online</span>':'<span class="offline">🔴 Offline</span>'}<br>Driver: ${esc(v.driver||'-')} | Order: ${esc(v.orderId||'-')}<br>📍 ${safeNumber(v.lat).toFixed(6)}, ${safeNumber(v.lng).toFixed(6)}<br><small>${esc(v.destination||'')} | ${v.updatedAt?new Date(v.updatedAt).toLocaleTimeString():'-'}</small></div>`}).join(''):'ကား GPS data မရှိသေးပါ။';
+ ids.forEach(id=>{
+  const v=data[id]; if(!v||!Number.isFinite(Number(v.lat))||!Number.isFinite(Number(v.lng)))return;
+  const pos=[Number(v.lat),Number(v.lng)];
+  if(!liveMarkers[id]) liveMarkers[id]=L.marker(pos).addTo(liveMap);
+  liveMarkers[id].setLatLng(pos).bindPopup(markerPopup(id,v));
+ });
+ Object.keys(liveMarkers).forEach(id=>{if(!data[id]){liveMap.removeLayer(liveMarkers[id]);delete liveMarkers[id];}});
+}
+let liveLastData={};
+function focusVehicle(id){const m=liveMarkers[id];if(m){liveMap.setView(m.getLatLng(),16);m.openPopup();}}
+async function startVehicleTracking(){
+ if(!liveConnected)return alert('အရင် Firebase ကို ချိတ်ပါ။');
+ if(!navigator.geolocation)return alert('ဒီ browser/device မှာ GPS မရနိုင်ပါ။');
+ const id=document.getElementById('liveVehicleSelect')?.value;if(!id)return alert('ကားရွေးပါ။');
+ const driver=document.getElementById('liveDriverName')?.value.trim()||'Driver';
+ const orderId=document.getElementById('liveOrderId')?.value.trim()||'';
+ const destination=document.getElementById('liveDestination')?.value.trim()||'';
+ if(liveGeoWatch!==null)navigator.geolocation.clearWatch(liveGeoWatch);
+ document.getElementById('trackingStatus').innerHTML='Tracking: <span class="tracking">🟢 GPS စောင့်ကြည့်နေသည်...</span>';
+ liveGeoWatch=navigator.geolocation.watchPosition(pos=>{
+   const c=pos.coords, data={lat:c.latitude,lng:c.longitude,speed:Number.isFinite(c.speed)?Math.max(0,c.speed*3.6):0,heading:Number.isFinite(c.heading)?c.heading:0,driver,orderId,destination,online:true,updatedAt:Date.now()};
+   liveRTDB.ref('vehicleLocations/'+id).set(data).catch(e=>{document.getElementById('trackingStatus').textContent='Firebase write error: '+e.message;});
+   if(liveMap){liveMap.setView([c.latitude,c.longitude],16);}
+ },err=>{document.getElementById('trackingStatus').innerHTML='GPS Error: '+esc(err.message);},{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+}
+function stopVehicleTracking(){
+ if(liveGeoWatch!==null){navigator.geolocation.clearWatch(liveGeoWatch);liveGeoWatch=null;}
+ const id=document.getElementById('liveVehicleSelect')?.value;
+ if(liveConnected&&id)liveRTDB.ref('vehicleLocations/'+id+'/online').set(false).catch(()=>{});
+ const e=document.getElementById('trackingStatus');if(e)e.textContent='Tracking: OFF';
+}
+function loadLiveSettings(){const u=localStorage.getItem('tpg_rtdb_url');if(u){const e=document.getElementById('rtdbUrl');if(e)e.value=u;}renderLiveVehicleSelect();}
+setTimeout(()=>{try{initFirestore();}catch(e){}},500);
+setTimeout(loadLiveSettings,300);
+setTimeout(async()=>{
+  const url=getConfiguredRTDBUrl();
+  if(url && window.firebase){
+    if(ensureFirebaseConnection(url)){
+      liveConnected=true;
+      setLiveStatus('Firebase: 🟢 Cloud ချိတ်ဆက်ပြီးပါပြီ','online');
+      await hydrateFromCloud();
+      liveLocationsRef=liveRTDB.ref('vehicleLocations');
+      orderSyncRef=liveRTDB.ref('orderDeliveryStatus');
+      startOrderSyncListener(); setupStaffAccessSync(); startDriverOrderNotificationListener();
+    }
+  }
+},700);
+
+
+</script>
+<div id="cloudOwnerStatus" class="cloud-owner-status">☁️ Cloud data: စတင်ချိတ်ဆက်နေပါသည်...</div><div style="text-align:right;margin:4px 0 8px"><button class="smallbtn" type="button" onclick="syncBusinessDataToFirestore(true)">☁️ Firestore Sync ပြုလုပ်မည်</button></div>
+<script id="cloud-owner-status-js">setTimeout(()=>{const e=document.getElementById('cloudOwnerStatus'); if(e)e.textContent=(navigator.onLine&&getConfiguredRTDBUrl())?'☁️ Cloud data: Firebase မှာ မျှဝေထားသော data ကို အသုံးပြုနေပါသည်။':'☁️ Cloud data: Firebase RTDB URL ထည့်ပြီး အင်တာနက်ချိတ်ဆက်ထားပါ။';},1200);</script>
+</body>
+</html>
